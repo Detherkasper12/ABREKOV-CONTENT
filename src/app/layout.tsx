@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Assistant, JetBrains_Mono, Karantina } from "next/font/google";
+import { SiteAnalytics } from "@/components/ClickTracker";
 import "./globals.css";
 
 const assistant = Assistant({ variable: "--font-assistant", subsets: ["hebrew", "latin"], display: "swap" });
@@ -20,7 +21,10 @@ export const viewport: Viewport = { themeColor: "#12332A" };
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="he" dir="rtl" className={`${assistant.variable} ${jetbrains.variable} ${karantina.variable} antialiased`}>
-      <body className="min-h-dvh">{children}</body>
+      <body className="min-h-dvh">
+        {children}
+        <SiteAnalytics />
+      </body>
     </html>
   );
 }

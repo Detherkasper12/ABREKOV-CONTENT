@@ -328,4 +328,55 @@ textarea.field.mono {
   border: 1px dashed var(--color-line);
   color: var(--color-muted);
 }
+
+.btn-primary,
+.btn-lime {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background-color 0.15s, transform 0.15s;
+}
+.btn-primary:active,
+.btn-lime:active {
+  transform: translateY(1px);
+}
+.btn-lime {
+  border-radius: 999px;
+  background: var(--color-lime);
+  color: var(--color-ink);
+  font-weight: 800;
+  padding: 0 22px;
+  min-height: 46px;
+}
+.btn-lime:hover {
+  background: #e4ff7a;
+}
+.btn-primary:focus-visible,
+.btn-lime:focus-visible,
+.card:focus-visible {
+  outline: 3px solid var(--color-lime);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 5px var(--color-forest);
+}
+
+/* Generated cover patterns: quiet texture, never a gradient wash. */
+.cover-grid-lime {
+  background-image: linear-gradient(rgb(214 255 58 / 0.09) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(214 255 58 / 0.09) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+.cover-grid-forest {
+  background-image: linear-gradient(rgb(18 51 42 / 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(18 51 42 / 0.08) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+.cover-dots-forest {
+  background-image: radial-gradient(rgb(18 51 42 / 0.16) 1.2px, transparent 1.3px);
+  background-size: 16px 16px;
+}
+.cover-dots-lime {
+  background-image: radial-gradient(rgb(214 255 58 / 0.16) 1.2px, transparent 1.3px);
+  background-size: 16px 16px;
+}
 }

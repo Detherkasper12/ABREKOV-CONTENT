@@ -3,6 +3,7 @@ import Link from "next/link";
 import { headingAnchor, type BlockOf } from "@/lib/blocks";
 import type { Resource, ResourceSummary } from "@/lib/data";
 import type { SiteSettings } from "@/lib/settings-schema";
+import { ContactCta } from "./ContactCta";
 import { BlockList } from "./blocks/BlockRenderer";
 import { formatPrice, ResourceCard } from "./ResourceCard";
 
@@ -46,7 +47,14 @@ export function ResourceArticle({
             {r.kind === "paid" ? "מוצר דיגיטלי" : "חינם"}
           </span>
         </div>
-        <h1 className="font-display text-[clamp(52px,12vw,92px)] leading-[0.86] text-balance text-forest">{r.title}</h1>
+        <h1
+          className={`font-display leading-[0.88] text-balance text-forest ${
+            // Karantina is condensed, but long Hebrew titles still need a smaller step on phones.
+            r.title.length > 48 ? "text-[clamp(40px,8vw,72px)]" : "text-[clamp(52px,12vw,92px)]"
+          }`}
+        >
+          {r.title}
+        </h1>
         {r.description && <p className="text-[19px] leading-relaxed font-semibold text-ink/85">{r.description}</p>}
         <p className="text-[14px] text-muted">
           עודכן ב־{dateFmt.format(r.updatedAt)}
@@ -116,6 +124,16 @@ export function ResourceArticle({
             </nav>
           </aside>
         )}
+      </div>
+
+      <div className="mt-16 max-w-[760px]">
+        <ContactCta
+          settings={settings}
+          title={settings.resourceCtaTitle}
+          text={settings.resourceCtaText}
+          button={settings.resourceCtaButton}
+          place="resource"
+        />
       </div>
 
       {related.length > 0 && (

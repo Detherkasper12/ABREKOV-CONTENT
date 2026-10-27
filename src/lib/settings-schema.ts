@@ -14,6 +14,9 @@ export const settingsSchema = z.object({
   collabTitle: text(160),
   collabText: text(600),
   collabButton: text(60),
+  resourceCtaTitle: text(160),
+  resourceCtaText: text(600),
+  resourceCtaButton: text(60),
   newsletterEnabled: z.boolean().default(false),
   newsletterTitle: text(160),
   newsletterText: text(400),
@@ -37,8 +40,8 @@ export type SiteSettings = z.infer<typeof settingsSchema>;
 // Defaults hold only facts Dima supplied. Contact email and portfolio stay empty
 // until he fills them in /admin/settings; empty fields are hidden on the site.
 export const DEFAULT_SETTINGS: SiteSettings = {
-  heroTitle: "כלים, מדריכים ופרומפטים לעיצוב, AI ופיתוח",
-  heroText: "כל המשאבים מהפוסטים של ‎@abrekov.design במקום אחד. הכול פתוח לקריאה ולהעתקה, בלי הרשמה.",
+  heroTitle: "כלים, פרומפטים ומדריכים שחוסכים לך שעות עבודה",
+  heroText: "למעצבים, מפתחים ויוצרים שעובדים עם AI. כל משאב מהפוסטים של ‎@abrekov.design, מוכן להעתקה, בחינם ובלי הרשמה.",
   instagramHandle: "abrekov.design",
   portfolioUrl: "",
   contactEmail: "",
@@ -47,6 +50,9 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   collabTitle: "יש לך פרויקט?",
   collabText: "אתרים, ממשקים, מוצרים דיגיטליים ואוטומציות עם AI. ספר לי מה אתה בונה.",
   collabButton: "בוא נדבר",
+  resourceCtaTitle: "צריך אתר או מוצר דיגיטלי משלך?",
+  resourceCtaText: "אני מעצב ומפתח אתרים ומוצרים דיגיטליים. יש לך רעיון? בוא נדבר.",
+  resourceCtaButton: "בוא נדבר",
   newsletterEnabled: false,
   newsletterTitle: "רוצה לקבל כלים ומדריכים חדשים?",
   newsletterText: "מייל קצר כשעולה משאב חדש. בלי ספאם, אפשר לבטל בכל רגע.",

@@ -79,7 +79,7 @@ export function BlockView({ block }: { block: Block }) {
         <div className="codebox prompt">
           <div className="codebox-head">
             <span>{block.title || "פרומפט"}</span>
-            <CopyButton text={block.text} label="העתק פרומפט" />
+            <CopyButton text={block.text} label="העתק פרומפט" kind="prompt" />
           </div>
           <pre dir="auto">{block.text}</pre>
         </div>
