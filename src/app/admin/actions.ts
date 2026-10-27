@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { requireAdmin, isAdminEmail } from "@/lib/auth";
-import { db } from "@/lib/db";
+import { db, ensureSchema } from "@/lib/db";
 import { getById } from "@/lib/data";
 import { publishProblems, resourceInputSchema, type ResourceInput } from "@/lib/resource-schema";
 import { settingsSchema, type SiteSettings } from "@/lib/settings-schema";
@@ -91,13 +91,17 @@ export async function saveResource(input: ResourceInput): Promise<ActionResult &
   }
 
   const tags = [...new Set(r.tags)];
+  // Media storage is public, so a paid product never keeps a download file here.
+  const file = r.kind === "paid" ? { url: "", name: "", size: 0 } : { url: r.fileUrl, name: r.fileName, size: r.fileSize };
+  await ensureSchema();
   await sql`
     update resources set
       slug = ${r.slug}, title = ${r.title}, description = ${r.description}, label = ${r.label},
       keyword = ${r.keyword}, cover_url = ${r.coverUrl}, cover_alt = ${r.coverAlt}, category = ${r.category},
       tags = ${tags}, kind = ${r.kind}, price_ils = ${r.kind === "paid" ? r.priceIls : null},
       checkout_url = ${r.checkoutUrl}, featured = ${r.featured}, seo_title = ${r.seoTitle},
-      seo_description = ${r.seoDescription}, blocks = ${sql.json(r.blocks as never)}, updated_at = now()
+      seo_description = ${r.seoDescription}, file_url = ${file.url}, file_name = ${file.name},
+      file_size = ${file.size}, blocks = ${sql.json(r.blocks as never)}, updated_at = now()
     where id = ${r.id}`;
 
   refreshPublic(r.slug, current.slug);

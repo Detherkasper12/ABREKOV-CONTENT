@@ -71,6 +71,29 @@ export function ResourceArticle({
         </p>
       </header>
 
+      {r.kind === "free" && (
+        <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3">
+          {r.fileUrl ? (
+            <a href={r.fileUrl} download={r.fileName || true} data-track="download_click" data-track-slug={r.slug} data-track-type="file" className="btn-primary min-h-12 px-6">
+              <span aria-hidden>↓</span>
+              הורדת הקובץ
+              {r.fileName && <bdi className="ltr font-mono text-[13px] font-semibold opacity-80">{r.fileName.split(".").pop()?.toUpperCase()}</bdi>}
+            </a>
+          ) : null}
+          <a
+            href={`/resources/${r.slug}/download`}
+            download
+            data-track="download_click"
+            data-track-slug={r.slug}
+            data-track-type="markdown"
+            className={r.fileUrl ? "text-[15px] font-bold text-forest underline-offset-4 hover:underline" : "btn-primary min-h-12 px-6"}
+          >
+            {!r.fileUrl && <span aria-hidden>↓</span>}
+            {r.fileUrl ? "או את כל הדף כקובץ Markdown" : "הורדת המשאב כקובץ"}
+          </a>
+        </div>
+      )}
+
       {r.coverUrl && (
         <img
           src={r.coverUrl}

@@ -23,13 +23,16 @@ export type Resource = {
   featured: boolean;
   seoTitle: string;
   seoDescription: string;
+  fileUrl: string;
+  fileName: string;
+  fileSize: number;
   blocks: Block[];
   createdAt: Date;
   updatedAt: Date;
   publishedAt: Date | null;
 };
 
-export type ResourceSummary = Omit<Resource, "blocks" | "seoTitle" | "seoDescription">;
+export type ResourceSummary = Omit<Resource, "blocks" | "seoTitle" | "seoDescription" | "fileUrl" | "fileName" | "fileSize">;
 
 type Row = Record<string, unknown>;
 
@@ -38,6 +41,10 @@ function toResource(row: Row): Resource {
   return {
     ...(row as unknown as Resource),
     priceIls: row.priceIls == null ? null : Number(row.priceIls),
+    // The file columns may not exist yet on a database that predates migration 0002.
+    fileUrl: (row.fileUrl as string) ?? "",
+    fileName: (row.fileName as string) ?? "",
+    fileSize: Number(row.fileSize ?? 0),
     blocks: parsed.success ? parsed.data : [],
   };
 }

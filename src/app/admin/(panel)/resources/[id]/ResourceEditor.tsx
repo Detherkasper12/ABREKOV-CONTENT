@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState, useTransition, type ReactNode } from "react";
 import { BLOCK_TYPES, emptyBlock, newBlockId, type Block, type BlockType } from "@/lib/blocks";
 import type { ResourceStatus } from "@/lib/data";
+import { markdownToResource } from "@/lib/markdown";
 import { publishProblems, type ResourceInput } from "@/lib/resource-schema";
 import { deleteResource, duplicateResource, saveResource, setStatus } from "../../../actions";
 import { BlockFields } from "./BlockEditors";
@@ -380,6 +381,58 @@ export function ResourceEditor({
             <Labeled label="טקסט חלופי">
               <input value={r.coverAlt} onChange={(e) => update({ coverAlt: e.target.value })} className="field" />
             </Labeled>
+          </Section>
+
+          <Section title="קובץ להורדה">
+            {r.kind === "paid" ? (
+              <p className="text-[14px] text-muted">למוצר בתשלום הקובץ נמסר בעמוד התשלום, לא מהאתר.</p>
+            ) : (
+              <>
+                {r.fileUrl && (
+                  <p className="ltr truncate text-start font-mono text-[13px]">
+                    {r.fileName || r.fileUrl}
+                    {r.fileSize > 0 && ` · ${Math.max(1, Math.round(r.fileSize / 1024))} KB`}
+                  </p>
+                )}
+                <div className="flex flex-wrap gap-2">
+                  <UploadButton
+                    label={r.fileUrl ? "החלף קובץ" : "העלאת קובץ"}
+                    onUploaded={(f) => update({ fileUrl: f.url, fileName: f.fileName, fileSize: f.size })}
+                  />
+                  {r.fileUrl && (
+                    <button type="button" className="btn btn-danger" onClick={() => update({ fileUrl: "", fileName: "", fileSize: 0 })}>
+                      הסר
+                    </button>
+                  )}
+                </div>
+                <p className="text-[13px] text-muted">מופיע בראש הדף ככפתור הורדה. בלי קובץ, הדף עצמו יורד כקובץ Markdown.</p>
+              </>
+            )}
+          </Section>
+
+          <Section title="ייבוא מקובץ">
+            <label className="btn cursor-pointer justify-self-start">
+              ייבוא מ־Markdown
+              <input
+                type="file"
+                accept=".md,.markdown,.txt,text/markdown,text/plain"
+                className="sr-only"
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  e.target.value = "";
+                  if (!file) return;
+                  const imported = markdownToResource(await file.text());
+                  // An empty resource takes its title and description from the file; otherwise they stay.
+                  const fresh = r.blocks.length === 0;
+                  update({
+                    title: fresh || !r.title.trim() ? imported.title || file.name.replace(/\.\w+$/, "") : r.title,
+                    description: fresh || !r.description.trim() ? imported.description || r.description : r.description,
+                    blocks: [...r.blocks, ...imported.blocks],
+                  });
+                }}
+              />
+            </label>
+            <p className="text-[13px] text-muted">במשאב ריק הקובץ ממלא גם כותרת ותיאור. אחרת הבלוקים נוספים בסוף. כותרות, טקסט, קוד ופרומפטים מזוהים לבד.</p>
           </Section>
 
           <Section title="חינם או בתשלום">
