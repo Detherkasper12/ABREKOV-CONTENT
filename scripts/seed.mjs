@@ -28,7 +28,7 @@ console.log("wrote supabase/seed.sql");
 
 if (process.argv.includes("--apply")) {
   const { default: postgres } = await import("postgres");
-  const sql = postgres(process.env.DATABASE_URL, { prepare: false, max: 1 });
+  const sql = postgres(process.env.DATABASE_URL || process.env.POSTGRES_URL, { prepare: false, max: 1 });
   await sql.unsafe(sqlText);
   await sql.end();
   console.log("applied to DATABASE_URL");
