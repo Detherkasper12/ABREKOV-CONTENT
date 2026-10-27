@@ -80,6 +80,9 @@ export function SettingsForm({ initial, emailReady }: { initial: SiteSettings; e
         <F label="כותרת שיתוף פעולה">{text("collabTitle")}</F>
         <F label="טקסט שיתוף פעולה">{text("collabText", { area: true })}</F>
         <F label="טקסט הכפתור">{text("collabButton")}</F>
+        <F label="כותרת בסוף דף משאב" hint="ריק = הבלוק לא מוצג">{text("resourceCtaTitle")}</F>
+        <F label="טקסט בסוף דף משאב">{text("resourceCtaText", { area: true })}</F>
+        <F label="כפתור בסוף דף משאב">{text("resourceCtaButton")}</F>
       </Group>
 
       <Group title="קישורים נוספים">

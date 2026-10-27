@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-export function CopyButton({ text, label = "העתק" }: { text: string; label?: string }) {
+export function CopyButton({ text, label = "העתק", kind = "code" }: { text: string; label?: string; kind?: "code" | "prompt" }) {
   const [state, setState] = useState<"idle" | "done" | "failed">("idle");
 
   async function copy() {
@@ -26,7 +26,7 @@ export function CopyButton({ text, label = "העתק" }: { text: string; label?:
   }
 
   return (
-    <button type="button" className="copy-btn" onClick={copy} aria-live="polite">
+    <button type="button" className="copy-btn" onClick={copy} aria-live="polite" data-track="copy_click" data-track-kind={kind}>
       {state === "done" ? "הועתק ✓" : state === "failed" ? "סמן והעתק ידנית" : label}
     </button>
   );

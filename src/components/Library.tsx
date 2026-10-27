@@ -26,6 +26,8 @@ export function Library({
   // Only offer categories that actually have resources, so no chip leads to an empty grid.
   const used = categories.filter((c) => resources.some((r) => r.category === c.slug));
   const hasPaid = resources.some((r) => r.kind === "paid");
+  // A search box over a handful of cards is noise; it appears once the library grows.
+  const showSearch = resources.length >= 6;
 
   const results = useMemo(() => {
     const q = normalize(query.trim());
@@ -47,23 +49,26 @@ export function Library({
   }
 
   const chip = (active: boolean) =>
-    `rounded-full border px-3.5 py-1.5 text-[14px] font-bold transition-colors ${
+    `min-h-10 rounded-full border px-3.5 py-1.5 text-[14px] font-bold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest ${
       active ? "border-forest bg-forest text-lime" : "border-line bg-surface hover:border-forest"
     }`;
 
   return (
     <div className="grid gap-5">
       <div className="grid gap-3">
-        <label className="relative block">
-          <span className="sr-only">חיפוש משאבים</span>
-          <input
-            type="search"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="חפש סקיל, פרומפט, כלי…"
-            className="h-12 w-full rounded-full border border-line bg-surface px-5 text-[16px] outline-none placeholder:text-muted focus:border-forest"
-          />
-        </label>
+        {showSearch && (
+          <label className="relative block">
+            <span className="sr-only">חיפוש משאבים</span>
+            <input
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="חפש סקיל, פרומפט, כלי…"
+              className="h-12 w-full rounded-full border border-line bg-surface px-5 text-[16px] outline-none placeholder:text-muted focus:border-forest focus-visible:ring-2 focus-visible:ring-lime"
+            />
+          </label>
+        )}
+        {(used.length > 1 || hasPaid) && (
         <div className="flex flex-wrap gap-2" role="group" aria-label="סינון לפי קטגוריה">
           <button type="button" className={chip(!category)} aria-pressed={!category} onClick={() => pickCategory("")}>
             הכול
@@ -83,6 +88,7 @@ export function Library({
             </span>
           )}
         </div>
+        )}
       </div>
 
       <p className="text-[14px] text-muted" aria-live="polite">
@@ -90,7 +96,7 @@ export function Library({
       </p>
 
       {results.length > 0 ? (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className={`grid gap-4 sm:grid-cols-2 ${results.length > 2 ? "lg:grid-cols-3" : ""}`}>
           {results.map((r) => (
             <ResourceCard key={r.id} r={r} categoryLabel={labels.get(r.category)} />
           ))}
