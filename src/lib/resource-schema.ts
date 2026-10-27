@@ -24,6 +24,9 @@ export const resourceInputSchema = z.object({
   featured: z.boolean(),
   seoTitle: z.string().trim().max(160),
   seoDescription: z.string().trim().max(300),
+  fileUrl: safeUrl,
+  fileName: z.string().trim().max(200),
+  fileSize: z.number().int().nonnegative(),
   blocks: blocksSchema,
 });
 

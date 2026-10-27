@@ -13,7 +13,7 @@ export default async function EditResourcePage(props: PageProps<"/admin/resource
     id: r.id, slug: r.slug, title: r.title, description: r.description, label: r.label, keyword: r.keyword,
     coverUrl: r.coverUrl, coverAlt: r.coverAlt, category: r.category, tags: r.tags, kind: r.kind,
     priceIls: r.priceIls, checkoutUrl: r.checkoutUrl, featured: r.featured, seoTitle: r.seoTitle,
-    seoDescription: r.seoDescription, blocks: r.blocks,
+    seoDescription: r.seoDescription, fileUrl: r.fileUrl, fileName: r.fileName, fileSize: r.fileSize, blocks: r.blocks,
   };
   return <ResourceEditor key={r.id} initial={input} status={r.status} categories={settings.categories} />;
 }

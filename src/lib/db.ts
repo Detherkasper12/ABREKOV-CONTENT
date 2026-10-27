@@ -30,3 +30,20 @@ export function db(): Sql {
   }
   return globalForDb.__abrekovSql;
 }
+
+// Additive columns added after the first release (supabase/migrations/0002_resource_file.sql).
+// Applied once per server instance before writes, so a deploy never waits on a manual SQL step.
+let schemaReady: Promise<unknown> | undefined;
+export function ensureSchema() {
+  schemaReady ??= db()
+    .unsafe(
+      `alter table resources add column if not exists file_url text not null default '';
+       alter table resources add column if not exists file_name text not null default '';
+       alter table resources add column if not exists file_size bigint not null default 0;`,
+    )
+    .catch((e) => {
+      schemaReady = undefined;
+      throw e;
+    });
+  return schemaReady;
+}
