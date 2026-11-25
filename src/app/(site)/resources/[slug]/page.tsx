@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ResourceArticle } from "@/components/ResourceArticle";
+import { hasAccess } from "@/lib/access";
 import { SiteShell } from "@/components/SiteShell";
 import { getPublishedBySlug, getSettings, listRelated } from "@/lib/data";
 
@@ -26,12 +27,15 @@ export async function generateMetadata(props: PageProps<"/resources/[slug]">): P
 
 export default async function ResourcePage(props: PageProps<"/resources/[slug]">) {
   const { slug } = await props.params;
-  const resource = await getPublishedBySlug(slug);
-  if (!resource) notFound();
+  const full = await getPublishedBySlug(slug);
+  if (!full) notFound();
+  const locked = !(await hasAccess(full));
+  // A locked page is rendered from a copy without the content, so nothing of it can reach the browser.
+  const resource = locked ? { ...full, blocks: [], fileUrl: "", fileName: "", fileSize: 0, accessKey: "" } : full;
   const [settings, related] = await Promise.all([getSettings(), resource.unlisted ? [] : listRelated(resource)]);
   return (
     <SiteShell settings={settings} isolated={resource.unlisted}>
-      <ResourceArticle resource={resource} settings={settings} related={related} />
+      <ResourceArticle resource={resource} settings={settings} related={related} locked={locked} />
     </SiteShell>
   );
 }

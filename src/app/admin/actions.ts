@@ -109,6 +109,31 @@ export async function saveResource(input: ResourceInput): Promise<ActionResult &
   return { ok: true, slug: r.slug };
 }
 
+// Closing a guide: its content then opens only through /resources/<slug>/access?k=<key>.
+// A new key replaces the old one, so every link sent before stops working.
+export async function createAccessKey(id: string): Promise<(ActionResult & { ok: true; key: string }) | { ok: false; error: string }> {
+  await requireAdmin();
+  if (!idSchema.safeParse(id).success) return { ok: false, error: "בקשה לא תקינה" };
+  await ensureSchema();
+  const key = randomBytes(24).toString("base64url");
+  const [row] = await db()`update resources set access_key = ${key}, updated_at = now() where id = ${id} returning slug`;
+  if (!row) return { ok: false, error: "המשאב לא נמצא" };
+  refreshPublic(row.slug);
+  revalidatePath("/admin");
+  return { ok: true, key };
+}
+
+export async function clearAccessKey(id: string): Promise<ActionResult> {
+  await requireAdmin();
+  if (!idSchema.safeParse(id).success) return { ok: false, error: "בקשה לא תקינה" };
+  await ensureSchema();
+  const [row] = await db()`update resources set access_key = '', updated_at = now() where id = ${id} returning slug`;
+  if (!row) return { ok: false, error: "המשאב לא נמצא" };
+  refreshPublic(row.slug);
+  revalidatePath("/admin");
+  return { ok: true };
+}
+
 export async function setStatus(id: string, status: "draft" | "published" | "archived"): Promise<ActionResult> {
   await requireAdmin();
   if (!idSchema.safeParse(id).success || !["draft", "published", "archived"].includes(status)) {

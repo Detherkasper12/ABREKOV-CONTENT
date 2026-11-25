@@ -22,7 +22,7 @@ export function ResourceCard({ r, categoryLabel }: { r: ResourceSummary; categor
             r.kind === "paid" ? "bg-ink text-lime" : "bg-surface text-ink"
           }`}
         >
-          {r.kind === "paid" ? formatPrice(r.priceIls) || "בתשלום" : "חינם"}
+          {r.kind === "paid" ? formatPrice(r.priceIls) || "בתשלום" : r.locked ? "🔒 בקישור אישי" : "חינם"}
         </span>
       </div>
       <div className="flex flex-1 flex-col gap-2 p-4 sm:p-5">

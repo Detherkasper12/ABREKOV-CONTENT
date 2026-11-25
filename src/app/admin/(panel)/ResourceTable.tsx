@@ -67,6 +67,7 @@ export function ResourceTable({ resources, categories }: { resources: ResourceSu
                   {r.title}
                 </Link>
                 <span className={`status status-${r.status}`}>{STATUS_LABEL[r.status]}</span>
+                {r.locked && <span className="status bg-surface text-ink">🔒 סגור</span>}
                 {r.unlisted && <span className="status bg-surface text-ink">רק בקישור</span>}
                 {r.kind === "paid" && <span className="status bg-ink text-lime">{formatPrice(r.priceIls) || "בתשלום"}</span>}
               </div>

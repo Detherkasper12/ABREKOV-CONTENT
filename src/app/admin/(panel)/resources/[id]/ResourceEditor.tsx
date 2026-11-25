@@ -8,7 +8,8 @@ import { BLOCK_TYPES, emptyBlock, newBlockId, type Block, type BlockType } from 
 import type { ResourceStatus } from "@/lib/data";
 import { markdownToResource } from "@/lib/markdown";
 import { publishProblems, type ResourceInput } from "@/lib/resource-schema";
-import { deleteResource, duplicateResource, saveResource, setStatus } from "../../../actions";
+import { CopyButton } from "@/components/CopyButton";
+import { clearAccessKey, createAccessKey, deleteResource, duplicateResource, saveResource, setStatus } from "../../../actions";
 import { BlockFields } from "./BlockEditors";
 import { UploadButton } from "./Upload";
 
@@ -80,16 +81,21 @@ export function ResourceEditor({
   initial,
   status: initialStatus,
   categories,
+  accessKey: initialKey,
+  siteUrl,
 }: {
   initial: ResourceInput;
   status: ResourceStatus;
   categories: { slug: string; label: string }[];
+  accessKey: string;
+  siteUrl: string;
 }) {
   const router = useRouter();
   const [r, setR] = useState<ResourceInput>(initial);
   const [status, setStatusState] = useState(initialStatus);
   const [savedSlug, setSavedSlug] = useState(initial.slug);
   const [tagsText, setTagsText] = useState(initial.tags.join(", "));
+  const [accessKey, setAccessKey] = useState(initialKey);
   const [dirty, setDirty] = useState(false);
   const [message, setMessage] = useState<{ kind: "ok" | "error"; text: string } | null>(null);
   const [pending, start] = useTransition();
@@ -415,6 +421,71 @@ export function ResourceEditor({
                   )}
                 </div>
                 <p className="text-[13px] text-muted">מופיע בראש הדף ככפתור הורדה. בלי קובץ, הדף עצמו יורד כקובץ Markdown.</p>
+              </>
+            )}
+          </Section>
+
+          <Section title="גישה">
+            {r.kind === "paid" ? (
+              <p className="text-[14px] text-muted">הגישה במוצר בתשלום נקבעת בעמוד התשלום.</p>
+            ) : accessKey ? (
+              <>
+                <p className="text-[14px] font-bold">🔒 המדריך סגור. הוא נפתח רק למי שיש לו את קישור הגישה.</p>
+                <input readOnly dir="ltr" value={`${siteUrl}/resources/${savedSlug}/access?k=${accessKey}`} onFocus={(ev) => ev.currentTarget.select()} className="field text-start font-mono text-[12.5px]" />
+                <div className="flex flex-wrap gap-2">
+                  <CopyButton text={`${siteUrl}/resources/${savedSlug}/access?k=${accessKey}`} label="העתק קישור גישה" />
+                  <button
+                    type="button"
+                    className="btn"
+                    disabled={pending}
+                    onClick={() =>
+                      start(async () => {
+                        if (!window.confirm("הקישור הקודם יפסיק לעבוד לכולם. להמשיך?")) return;
+                        const res = await createAccessKey(r.id);
+                        if (res.ok) setAccessKey(res.key);
+                        else setMessage({ kind: "error", text: res.error });
+                      })
+                    }
+                  >
+                    קישור חדש
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-danger"
+                    disabled={pending}
+                    onClick={() =>
+                      start(async () => {
+                        if (!window.confirm("המדריך ייפתח לכולם. להמשיך?")) return;
+                        const res = await clearAccessKey(r.id);
+                        if (res.ok) setAccessKey("");
+                        else setMessage({ kind: "error", text: res.error });
+                      })
+                    }
+                  >
+                    פתח לכולם
+                  </button>
+                </div>
+                <p className="text-[13px] text-muted">
+                  את הקישור הזה שולחים ב־DM. מי שנכנס אליו רואה את המדריך, ואחרי הכניסה כתובת הדף נקייה ולא מכילה את המפתח. מי שפותח את הדף בלי הקישור רואה רק כותרת, תיאור ונעילה. קישור חדש מבטל את כל הקישורים הקודמים. הקישור נשמר בדף כבר עכשיו, בלי צורך ללחוץ שמירה.
+                </p>
+              </>
+            ) : (
+              <>
+                <p className="text-[14px] text-muted">עכשיו המדריך פתוח לכולם. אם סוגרים אותו, הוא נפתח רק למי שיש לו קישור גישה אישי, ובספרייה נשארים רק הכותרת והתיאור.</p>
+                <button
+                  type="button"
+                  className="btn justify-self-start"
+                  disabled={pending}
+                  onClick={() =>
+                    start(async () => {
+                      const res = await createAccessKey(r.id);
+                      if (res.ok) setAccessKey(res.key);
+                      else setMessage({ kind: "error", text: res.error });
+                    })
+                  }
+                >
+                  🔒 סגור וצור קישור גישה
+                </button>
               </>
             )}
           </Section>
