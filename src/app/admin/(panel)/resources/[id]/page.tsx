@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { getById, getSettings } from "@/lib/data";
+import { siteUrl } from "@/lib/email";
 import type { ResourceInput } from "@/lib/resource-schema";
 import { ResourceEditor } from "./ResourceEditor";
 
@@ -15,5 +16,5 @@ export default async function EditResourcePage(props: PageProps<"/admin/resource
     priceIls: r.priceIls, checkoutUrl: r.checkoutUrl, featured: r.featured, unlisted: r.unlisted, seoTitle: r.seoTitle,
     seoDescription: r.seoDescription, fileUrl: r.fileUrl, fileName: r.fileName, fileSize: r.fileSize, blocks: r.blocks,
   };
-  return <ResourceEditor key={r.id} initial={input} status={r.status} categories={settings.categories} />;
+  return <ResourceEditor key={r.id} initial={input} status={r.status} categories={settings.categories} accessKey={r.accessKey} siteUrl={siteUrl()} />;
 }

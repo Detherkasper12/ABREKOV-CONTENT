@@ -14,10 +14,13 @@ export function ResourceArticle({
   resource: r,
   settings,
   related,
+  locked,
 }: {
   resource: Resource;
   settings: SiteSettings;
   related: ResourceSummary[];
+  // Closed guide viewed without its personal link: title, description and the lock only.
+  locked: boolean;
 }) {
   const categories = new Map(settings.categories.map((c) => [c.slug, c.label]));
   const headings = r.blocks.filter((b): b is BlockOf<"heading"> => b.type === "heading" && b.level === 2 && !!b.text);
@@ -74,7 +77,7 @@ export function ResourceArticle({
         </p>
       </header>
 
-      {r.kind === "free" && (
+      {r.kind === "free" && !locked && (
         <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3">
           {r.fileUrl ? (
             <a href={r.fileUrl} download={r.fileName || true} data-track="download_click" data-track-slug={r.slug} data-track-type="file" className="btn-primary min-h-12 px-6">
@@ -126,7 +129,24 @@ export function ResourceArticle({
         </div>
       )}
 
-      <div className="mt-10 grid gap-10 lg:grid-cols-[minmax(0,760px)_1fr]">
+      {locked && (
+        <div className="card mt-8 grid max-w-[760px] content-start justify-items-start gap-3 p-6 sm:p-8">
+          <span aria-hidden className="text-[28px]">🔒</span>
+          <h2 className="text-[clamp(22px,4vw,28px)] leading-tight font-extrabold text-forest">המדריך הזה נפתח בקישור אישי</h2>
+          <p className="max-w-[52ch] text-[17px] leading-relaxed">
+            {r.keyword ? (
+              <>
+                כתוב <bdi className="font-extrabold">{r.keyword}</bdi> בתגובה לפוסט ב־Instagram ואשלח לך את הקישור בהודעה.
+              </>
+            ) : (
+              "הקישור נשלח בהודעה אחרי הפוסט ב־Instagram."
+            )}{" "}
+            אם קיבלת קישור והדף לא נפתח, תבקש ממני קישור חדש.
+          </p>
+        </div>
+      )}
+
+      <div className={`mt-10 grid gap-10 lg:grid-cols-[minmax(0,760px)_1fr] ${locked ? "hidden" : ""}`}>
         <div className="min-w-0">
           {r.kind === "paid" && r.blocks.length > 0 && <p className="eyebrow mb-4">תצוגה מקדימה</p>}
           <BlockList blocks={r.blocks} />

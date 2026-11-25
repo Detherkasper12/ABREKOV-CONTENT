@@ -1,3 +1,4 @@
+import { hasAccess } from "@/lib/access";
 import { getPublishedBySlug } from "@/lib/data";
 import { siteUrl } from "@/lib/email";
 import { resourceToMarkdown } from "@/lib/markdown";
@@ -9,7 +10,8 @@ export const dynamic = "force-dynamic";
 export async function GET(_req: Request, ctx: { params: Promise<{ slug: string }> }) {
   const { slug } = await ctx.params;
   const r = await getPublishedBySlug(slug);
-  if (!r || r.kind === "paid") return new Response("Not found", { status: 404 });
+  // A closed guide is not downloadable without its access cookie.
+  if (!r || r.kind === "paid" || !(await hasAccess(r))) return new Response("Not found", { status: 404 });
   const body = resourceToMarkdown(r, `${siteUrl()}/resources/${r.slug}`);
   return new Response(body, {
     headers: {

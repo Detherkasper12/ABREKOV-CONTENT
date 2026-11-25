@@ -21,7 +21,7 @@ export default async function PreviewPage(props: PageProps<"/admin/resources/[id
         </Link>
       </div>
       <SiteHeader settings={settings} isolated={r.unlisted} />
-      <ResourceArticle resource={r} settings={settings} related={related} />
+      <ResourceArticle resource={r} settings={settings} related={related} locked={false} />
       <SiteFooter settings={settings} />
     </div>
   );

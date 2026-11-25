@@ -23,6 +23,8 @@ export type Resource = {
   featured: boolean;
   // Link-only: reachable by its direct URL, left out of the library, search, related and sitemap.
   unlisted: boolean;
+  // Secret key of a closed guide. Server-side only: never pass it to a public component.
+  accessKey: string;
   seoTitle: string;
   seoDescription: string;
   fileUrl: string;
@@ -34,7 +36,10 @@ export type Resource = {
   publishedAt: Date | null;
 };
 
-export type ResourceSummary = Omit<Resource, "blocks" | "seoTitle" | "seoDescription" | "fileUrl" | "fileName" | "fileSize">;
+export type ResourceSummary = Omit<Resource, "blocks" | "seoTitle" | "seoDescription" | "fileUrl" | "fileName" | "fileSize" | "accessKey"> & {
+  // Closed guide: its content opens only through a personal link.
+  locked: boolean;
+};
 
 type Row = Record<string, unknown>;
 
@@ -44,6 +49,7 @@ function toResource(row: Row): Resource {
     ...(row as unknown as Resource),
     priceIls: row.priceIls == null ? null : Number(row.priceIls),
     unlisted: Boolean(row.unlisted),
+    accessKey: (row.accessKey as string) ?? "",
     // The file columns may not exist yet on a database that predates migration 0002.
     fileUrl: (row.fileUrl as string) ?? "",
     fileName: (row.fileName as string) ?? "",
@@ -53,7 +59,7 @@ function toResource(row: Row): Resource {
 }
 
 function toSummary(row: Row): ResourceSummary {
-  return { ...(row as unknown as ResourceSummary), priceIls: row.priceIls == null ? null : Number(row.priceIls), unlisted: Boolean(row.unlisted) };
+  return { ...(row as unknown as ResourceSummary), priceIls: row.priceIls == null ? null : Number(row.priceIls), unlisted: Boolean(row.unlisted), locked: Boolean(row.locked) };
 }
 
 const SUMMARY_COLUMNS = [
@@ -67,7 +73,7 @@ export async function listPublished(): Promise<ResourceSummary[]> {
   await ensureSchema();
   const sql = db();
   const rows = await sql`
-    select ${sql(SUMMARY_COLUMNS)} from resources
+    select ${sql(SUMMARY_COLUMNS)}, (access_key <> '') as locked from resources
     where status = 'published' and not unlisted
     order by featured desc, published_at desc nulls last`;
   return rows.map(toSummary);
@@ -83,7 +89,7 @@ export async function listRelated(resource: Resource, limit = 3): Promise<Resour
   await ensureSchema();
   const sql = db();
   const rows = await sql`
-    select ${sql(SUMMARY_COLUMNS)} from resources
+    select ${sql(SUMMARY_COLUMNS)}, (access_key <> '') as locked from resources
     where status = 'published' and not unlisted and id <> ${resource.id}
     order by (category = ${resource.category} and category <> '')::int
            + coalesce(array_length(array(select unnest(tags) intersect select unnest(${resource.tags}::text[])), 1), 0) desc,
@@ -96,7 +102,7 @@ export async function listRelated(resource: Resource, limit = 3): Promise<Resour
 export async function listAll(): Promise<ResourceSummary[]> {
   await ensureSchema();
   const sql = db();
-  const rows = await sql`select ${sql(SUMMARY_COLUMNS)} from resources order by updated_at desc`;
+  const rows = await sql`select ${sql(SUMMARY_COLUMNS)}, (access_key <> '') as locked from resources order by updated_at desc`;
   return rows.map(toSummary);
 }
 
