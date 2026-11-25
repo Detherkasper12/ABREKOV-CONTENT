@@ -23,9 +23,11 @@ export function SiteHeader({ settings, isolated = false }: { settings: SiteSetti
         <nav className="flex items-center gap-1 text-[15px] font-bold" aria-label="ניווט ראשי">
           {!isolated && (
             <>
-              <Link href="/#library" className="rounded-full px-3 py-1.5 hover:bg-surface">
-                משאבים
-              </Link>
+              {settings.libraryPublic && (
+                <Link href="/#library" className="rounded-full px-3 py-1.5 hover:bg-surface">
+                  משאבים
+                </Link>
+              )}
               <Link href="/#about" className="rounded-full px-3 py-1.5 hover:bg-surface">
                 עליי
               </Link>

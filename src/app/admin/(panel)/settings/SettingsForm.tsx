@@ -65,6 +65,15 @@ export function SettingsForm({ initial, emailReady }: { initial: SiteSettings; e
       </div>
 
       <Group title="דף הבית">
+        <label className="grid gap-0.5 text-[15px] font-bold">
+          <span className="flex items-center gap-2">
+            <input type="checkbox" checked={s.libraryPublic} onChange={(e) => set({ libraryPublic: e.target.checked })} className="size-4 accent-[#12332A]" />
+            להציג את ספריית המשאבים בדף הבית
+          </span>
+          <span className="ps-6 text-[13px] font-normal text-muted">
+            כבוי = בדף הבית אין רשימת משאבים, חיפוש או sitemap, וכל משאב נפתח רק למי שיש לו את הקישור שלו.
+          </span>
+        </label>
         <F label="כותרת ראשית">{text("heroTitle")}</F>
         <F label="פתיח">{text("heroText", { area: true })}</F>
       </Group>

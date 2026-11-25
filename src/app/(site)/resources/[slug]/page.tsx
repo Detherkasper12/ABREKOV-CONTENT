@@ -9,15 +9,15 @@ export const dynamic = "force-dynamic";
 
 export async function generateMetadata(props: PageProps<"/resources/[slug]">): Promise<Metadata> {
   const { slug } = await props.params;
-  const r = await getPublishedBySlug(slug);
+  const [r, settings] = await Promise.all([getPublishedBySlug(slug), getSettings()]);
   if (!r) return { title: "לא נמצא" };
   const title = r.seoTitle || r.title;
   const description = r.seoDescription || r.description;
   return {
     title,
     description,
-    // A link-only guide must not be indexed or found through search engines.
-    robots: r.unlisted ? { index: false, follow: false } : undefined,
+    // A link-only guide, or any guide while the library isn't public, must not be indexed or found through search engines.
+    robots: r.unlisted || !settings.libraryPublic ? { index: false, follow: false } : undefined,
     alternates: { canonical: `/resources/${r.slug}` },
     openGraph: { title, description, type: "article", images: r.coverUrl ? [{ url: r.coverUrl }] : undefined },
     twitter: { card: r.coverUrl ? "summary_large_image" : "summary", title, description },
@@ -28,10 +28,12 @@ export default async function ResourcePage(props: PageProps<"/resources/[slug]">
   const { slug } = await props.params;
   const resource = await getPublishedBySlug(slug);
   if (!resource) notFound();
-  const [settings, related] = await Promise.all([getSettings(), resource.unlisted ? [] : listRelated(resource)]);
+  const settings = await getSettings();
+  const isolated = resource.unlisted || !settings.libraryPublic;
+  const related = isolated ? [] : await listRelated(resource);
   return (
-    <SiteShell settings={settings} isolated={resource.unlisted}>
-      <ResourceArticle resource={resource} settings={settings} related={related} />
+    <SiteShell settings={settings} isolated={isolated}>
+      <ResourceArticle resource={resource} settings={settings} related={related} isolated={isolated} />
     </SiteShell>
   );
 }

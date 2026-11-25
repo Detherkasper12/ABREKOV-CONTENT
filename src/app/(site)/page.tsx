@@ -1,4 +1,5 @@
 import { Library } from "@/components/Library";
+import { MembershipCta } from "@/components/MembershipCta";
 import { ContactCta } from "@/components/ContactCta";
 import { NewsletterForm } from "@/components/NewsletterForm";
 import { ResourceCard } from "@/components/ResourceCard";
@@ -11,7 +12,9 @@ export const dynamic = "force-dynamic";
 export const metadata = { alternates: { canonical: "/" } };
 
 export default async function HomePage(props: PageProps<"/">) {
-  const [settings, resources, sp] = await Promise.all([getSettings(), listPublished(), props.searchParams]);
+  const [settings, listed, sp] = await Promise.all([getSettings(), listPublished(), props.searchParams]);
+  // With the library off the homepage shows no guides at all.
+  const resources = settings.libraryPublic ? listed : [];
   // Featured row only adds value when the library has more than what it shows.
   const featured = resources.length > 3 ? resources.filter((r) => r.featured).slice(0, 3) : [];
   const labels = new Map(settings.categories.map((c) => [c.slug, c.label]));
@@ -27,10 +30,12 @@ export default async function HomePage(props: PageProps<"/">) {
         <h1 className="font-display text-[clamp(56px,11vw,96px)] leading-[0.86] text-balance text-forest">{settings.heroTitle}</h1>
         {settings.heroText && <p className="max-w-[56ch] text-[18px] leading-relaxed text-ink/80 sm:text-[19px]">{settings.heroText}</p>}
         <div className="mt-2 flex flex-wrap items-center gap-x-5 gap-y-3">
-          <a href="#library" className="btn-primary min-h-12 px-6 text-[16px]">
-            {resources.length > 1 ? `לכל ${resources.length} המשאבים` : "למשאבים"}
-            <span aria-hidden>↓</span>
-          </a>
+          {settings.libraryPublic && (
+            <a href="#library" className="btn-primary min-h-12 px-6 text-[16px]">
+              {resources.length > 1 ? `לכל ${resources.length} המשאבים` : "למשאבים"}
+              <span aria-hidden>↓</span>
+            </a>
+          )}
           {settings.aboutName && (
             <a href="#about" className="text-[15px] text-muted hover:text-ink">
               מאת <bdi className="font-bold text-ink">{settings.aboutName}</bdi>, מעצב ומפתח מוצרים דיגיטליים
@@ -53,6 +58,13 @@ export default async function HomePage(props: PageProps<"/">) {
         </section>
       )}
 
+      {!settings.libraryPublic && (
+        <div className="max-w-[760px]">
+          <MembershipCta settings={settings} />
+        </div>
+      )}
+
+      {settings.libraryPublic && (
       <section id="library" className="grid scroll-mt-20 gap-5" aria-labelledby="library-title">
         <h2 id="library-title" className="text-[24px] font-extrabold">
           {featured.length > 0 ? "כל המשאבים" : "המשאבים"}
@@ -67,6 +79,7 @@ export default async function HomePage(props: PageProps<"/">) {
           <p className="card p-6 text-muted">עוד אין פה משאבים. הראשון בדרך.</p>
         )}
       </section>
+      )}
 
       {showNewsletter && <NewsletterForm title={settings.newsletterTitle} text={settings.newsletterText} />}
 

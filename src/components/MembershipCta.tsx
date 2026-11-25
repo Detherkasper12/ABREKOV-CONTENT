@@ -9,7 +9,7 @@ function memberLink(settings: SiteSettings) {
   return null;
 }
 
-export function MembershipCta({ settings, slug }: { settings: SiteSettings; slug: string }) {
+export function MembershipCta({ settings, slug }: { settings: SiteSettings; slug?: string }) {
   const link = memberLink(settings);
   if (!link || (!settings.memberTitle && !settings.memberText)) return null;
   return (
@@ -21,6 +21,7 @@ export function MembershipCta({ settings, slug }: { settings: SiteSettings; slug
         {...(link.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
         data-track="membership_click"
         data-track-slug={slug}
+        data-track-place={slug ? "resource" : "home"}
         data-track-method={link.method}
         className="btn-primary mt-2"
       >

@@ -20,6 +20,8 @@ export const settingsSchema = z.object({
   memberTitle: text(160),
   memberText: text(600),
   memberButton: text(60),
+  // false = no public library: the homepage lists nothing and every guide is reachable only by its link.
+  libraryPublic: z.boolean().default(true),
   newsletterEnabled: z.boolean().default(false),
   newsletterTitle: text(160),
   newsletterText: text(400),
@@ -59,6 +61,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   memberTitle: "רוצה גישה מלאה ליותר מ־100 מדריכים?",
   memberText: "מנוי: ‎$25 לחודש. כתוב לי בצ'אט ואסביר איך מצטרפים.",
   memberButton: "לכתוב לי בצ'אט",
+  libraryPublic: true,
   newsletterEnabled: false,
   newsletterTitle: "רוצה לקבל כלים ומדריכים חדשים?",
   newsletterText: "מייל קצר כשעולה משאב חדש. בלי ספאם, אפשר לבטל בכל רגע.",
