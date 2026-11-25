@@ -353,6 +353,15 @@ export function ResourceEditor({
               <input type="checkbox" checked={r.featured} onChange={(e) => update({ featured: e.target.checked })} className="size-4 accent-[#12332A]" />
               מומלץ בדף הבית
             </label>
+            <label className="grid gap-0.5 text-[15px] font-bold">
+              <span className="flex items-center gap-2">
+                <input type="checkbox" checked={r.unlisted} onChange={(e) => update({ unlisted: e.target.checked })} className="size-4 accent-[#12332A]" />
+                רק בקישור (לא מופיע בספרייה)
+              </span>
+              <span className="ps-6 text-[13px] font-normal text-muted">
+                הדף נפתח רק למי שיש לו את הקישור: לא בדף הבית, לא בחיפוש, לא ב&quot;עוד משאבים&quot; ולא ב־Google. בדף עצמו אין קישורים לשאר המשאבים.
+              </span>
+            </label>
           </Section>
 
           <Section title="Instagram">

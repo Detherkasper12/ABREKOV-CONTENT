@@ -5,27 +5,38 @@ export function instagramUrl(handle: string) {
   return `https://www.instagram.com/${handle.replace(/^@/, "")}/`;
 }
 
-export function SiteHeader({ settings }: { settings: SiteSettings }) {
+export function SiteHeader({ settings, isolated = false }: { settings: SiteSettings; isolated?: boolean }) {
   return (
     <header className="sticky top-0 z-20 border-b border-line bg-bg/90 backdrop-blur-sm">
       <div className="mx-auto flex h-14 max-w-[1080px] items-center justify-between gap-4 px-4">
-        <Link href="/" className="sig text-[15px]" aria-label="ABREKOV, לדף הבית">
-          <i />
-          ABREKOV
-        </Link>
+        {isolated ? (
+          <span className="sig text-[15px]">
+            <i />
+            ABREKOV
+          </span>
+        ) : (
+          <Link href="/" className="sig text-[15px]" aria-label="ABREKOV, לדף הבית">
+            <i />
+            ABREKOV
+          </Link>
+        )}
         <nav className="flex items-center gap-1 text-[15px] font-bold" aria-label="ניווט ראשי">
-          <Link href="/#library" className="rounded-full px-3 py-1.5 hover:bg-surface">
-            משאבים
-          </Link>
-          <Link href="/#about" className="rounded-full px-3 py-1.5 hover:bg-surface">
-            עליי
-          </Link>
+          {!isolated && (
+            <>
+              <Link href="/#library" className="rounded-full px-3 py-1.5 hover:bg-surface">
+                משאבים
+              </Link>
+              <Link href="/#about" className="rounded-full px-3 py-1.5 hover:bg-surface">
+                עליי
+              </Link>
+            </>
+          )}
           {settings.instagramHandle && (
             <a
               href={instagramUrl(settings.instagramHandle)}
               target="_blank"
               rel="noopener noreferrer"
-              className="ltr hidden rounded-full px-3 py-1.5 font-mono text-[13px] hover:bg-surface sm:inline"
+              className={`ltr rounded-full px-3 py-1.5 font-mono text-[13px] hover:bg-surface ${isolated ? "" : "hidden sm:inline"}`}
             >
               @{settings.instagramHandle}
             </a>

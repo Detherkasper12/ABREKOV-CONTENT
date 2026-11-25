@@ -1,5 +1,5 @@
 import "server-only";
-import { db } from "./db";
+import { db, ensureSchema } from "./db";
 import { blocksSchema, type Block } from "./blocks";
 import { DEFAULT_SETTINGS, settingsSchema, type SiteSettings } from "./settings-schema";
 
@@ -21,6 +21,8 @@ export type Resource = {
   checkoutUrl: string;
   status: ResourceStatus;
   featured: boolean;
+  // Link-only: reachable by its direct URL, left out of the library, search, related and sitemap.
+  unlisted: boolean;
   seoTitle: string;
   seoDescription: string;
   fileUrl: string;
@@ -41,6 +43,7 @@ function toResource(row: Row): Resource {
   return {
     ...(row as unknown as Resource),
     priceIls: row.priceIls == null ? null : Number(row.priceIls),
+    unlisted: Boolean(row.unlisted),
     // The file columns may not exist yet on a database that predates migration 0002.
     fileUrl: (row.fileUrl as string) ?? "",
     fileName: (row.fileName as string) ?? "",
@@ -50,20 +53,22 @@ function toResource(row: Row): Resource {
 }
 
 function toSummary(row: Row): ResourceSummary {
-  return { ...(row as unknown as ResourceSummary), priceIls: row.priceIls == null ? null : Number(row.priceIls) };
+  return { ...(row as unknown as ResourceSummary), priceIls: row.priceIls == null ? null : Number(row.priceIls), unlisted: Boolean(row.unlisted) };
 }
 
 const SUMMARY_COLUMNS = [
   "id", "slug", "title", "description", "label", "keyword", "cover_url", "cover_alt", "category", "tags",
-  "kind", "price_ils", "checkout_url", "status", "featured", "created_at", "updated_at", "published_at",
+  "kind", "price_ils", "checkout_url", "status", "featured", "unlisted", "created_at", "updated_at", "published_at",
 ];
 
-// Public queries only ever return published rows.
+// Public queries only ever return published rows. A link-only (unlisted) one is returned
+// by slug alone, never by the list queries.
 export async function listPublished(): Promise<ResourceSummary[]> {
+  await ensureSchema();
   const sql = db();
   const rows = await sql`
     select ${sql(SUMMARY_COLUMNS)} from resources
-    where status = 'published'
+    where status = 'published' and not unlisted
     order by featured desc, published_at desc nulls last`;
   return rows.map(toSummary);
 }
@@ -75,10 +80,11 @@ export async function getPublishedBySlug(slug: string): Promise<Resource | null>
 }
 
 export async function listRelated(resource: Resource, limit = 3): Promise<ResourceSummary[]> {
+  await ensureSchema();
   const sql = db();
   const rows = await sql`
     select ${sql(SUMMARY_COLUMNS)} from resources
-    where status = 'published' and id <> ${resource.id}
+    where status = 'published' and not unlisted and id <> ${resource.id}
     order by (category = ${resource.category} and category <> '')::int
            + coalesce(array_length(array(select unnest(tags) intersect select unnest(${resource.tags}::text[])), 1), 0) desc,
              published_at desc nulls last
@@ -88,6 +94,7 @@ export async function listRelated(resource: Resource, limit = 3): Promise<Resour
 
 // Admin queries.
 export async function listAll(): Promise<ResourceSummary[]> {
+  await ensureSchema();
   const sql = db();
   const rows = await sql`select ${sql(SUMMARY_COLUMNS)} from resources order by updated_at desc`;
   return rows.map(toSummary);

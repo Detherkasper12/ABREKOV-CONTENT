@@ -99,7 +99,7 @@ export async function saveResource(input: ResourceInput): Promise<ActionResult &
       slug = ${r.slug}, title = ${r.title}, description = ${r.description}, label = ${r.label},
       keyword = ${r.keyword}, cover_url = ${r.coverUrl}, cover_alt = ${r.coverAlt}, category = ${r.category},
       tags = ${tags}, kind = ${r.kind}, price_ils = ${r.kind === "paid" ? r.priceIls : null},
-      checkout_url = ${r.checkoutUrl}, featured = ${r.featured}, seo_title = ${r.seoTitle},
+      checkout_url = ${r.checkoutUrl}, featured = ${r.featured}, unlisted = ${r.unlisted}, seo_title = ${r.seoTitle},
       seo_description = ${r.seoDescription}, file_url = ${file.url}, file_name = ${file.name},
       file_size = ${file.size}, blocks = ${sql.json(r.blocks as never)}, updated_at = now()
     where id = ${r.id}`;
