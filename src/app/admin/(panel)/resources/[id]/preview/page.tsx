@@ -11,7 +11,7 @@ export default async function PreviewPage(props: PageProps<"/admin/resources/[id
   const { id } = await props.params;
   const r = await getById(id);
   if (!r) notFound();
-  const [settings, related] = await Promise.all([getSettings(), listRelated(r)]);
+  const [settings, related] = await Promise.all([getSettings(), r.unlisted ? [] : listRelated(r)]);
   return (
     <div className="bg-bg">
       <div className="flex flex-wrap items-center justify-center gap-3 bg-lime px-4 py-2 text-[14px] font-bold">
@@ -20,7 +20,7 @@ export default async function PreviewPage(props: PageProps<"/admin/resources/[id
           חזרה לעריכה
         </Link>
       </div>
-      <SiteHeader settings={settings} />
+      <SiteHeader settings={settings} isolated={r.unlisted} />
       <ResourceArticle resource={r} settings={settings} related={related} />
       <SiteFooter settings={settings} />
     </div>

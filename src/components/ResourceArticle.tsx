@@ -4,6 +4,7 @@ import { headingAnchor, type BlockOf } from "@/lib/blocks";
 import type { Resource, ResourceSummary } from "@/lib/data";
 import type { SiteSettings } from "@/lib/settings-schema";
 import { ContactCta } from "./ContactCta";
+import { MembershipCta } from "./MembershipCta";
 import { BlockList } from "./blocks/BlockRenderer";
 import { formatPrice, ResourceCard } from "./ResourceCard";
 
@@ -24,21 +25,23 @@ export function ResourceArticle({
 
   return (
     <article className="mx-auto max-w-[1080px] px-4 pt-8">
-      <nav className="mb-6 flex flex-wrap items-center gap-2 text-[14px] text-muted" aria-label="פירורי לחם">
-        <Link href="/#library" className="font-bold hover:text-ink">
-          משאבים
-        </Link>
-        {r.category && categories.get(r.category) && (
-          <>
-            <span aria-hidden>/</span>
-            <Link href={`/?category=${r.category}#library`} className="hover:text-ink">
-              {categories.get(r.category)}
-            </Link>
-          </>
-        )}
-      </nav>
+      {!r.unlisted && (
+        <nav className="mb-6 flex flex-wrap items-center gap-2 text-[14px] text-muted" aria-label="פירורי לחם">
+          <Link href="/#library" className="font-bold hover:text-ink">
+            משאבים
+          </Link>
+          {r.category && categories.get(r.category) && (
+            <>
+              <span aria-hidden>/</span>
+              <Link href={`/?category=${r.category}#library`} className="hover:text-ink">
+                {categories.get(r.category)}
+              </Link>
+            </>
+          )}
+        </nav>
+      )}
 
-      <header className="grid max-w-[760px] gap-4">
+      <header className={`grid max-w-[760px] gap-4 ${r.unlisted ? "pt-2" : ""}`}>
         <div className="flex flex-wrap items-center gap-3">
           {r.label && <span className="ltr font-mono text-[12.5px] tracking-[0.06em] text-muted">{r.label}</span>}
           <span
@@ -149,7 +152,8 @@ export function ResourceArticle({
         )}
       </div>
 
-      <div className="mt-16 max-w-[760px]">
+      <div className="mt-16 grid max-w-[760px] gap-5">
+        {r.kind === "free" && <MembershipCta settings={settings} slug={r.slug} />}
         <ContactCta
           settings={settings}
           title={settings.resourceCtaTitle}
@@ -159,7 +163,7 @@ export function ResourceArticle({
         />
       </div>
 
-      {related.length > 0 && (
+      {!r.unlisted && related.length > 0 && (
         <section className="mt-16 grid gap-5 border-t border-line pt-10">
           <h2 className="text-[24px] font-extrabold">עוד משאבים</h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

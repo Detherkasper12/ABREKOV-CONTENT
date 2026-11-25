@@ -22,6 +22,7 @@ export const resourceInputSchema = z.object({
     .max(2000)
     .refine((v) => v === "" || /^https:\/\//i.test(v), "קישור התשלום חייב להתחיל ב־https://"),
   featured: z.boolean(),
+  unlisted: z.boolean(),
   seoTitle: z.string().trim().max(160),
   seoDescription: z.string().trim().max(300),
   fileUrl: safeUrl,

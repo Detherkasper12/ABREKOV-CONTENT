@@ -2,6 +2,7 @@ import { Library } from "@/components/Library";
 import { ContactCta } from "@/components/ContactCta";
 import { NewsletterForm } from "@/components/NewsletterForm";
 import { ResourceCard } from "@/components/ResourceCard";
+import { SiteShell } from "@/components/SiteShell";
 import { instagramUrl } from "@/components/SiteChrome";
 import { getSettings, listPublished } from "@/lib/data";
 import { emailConfigured } from "@/lib/email";
@@ -17,6 +18,7 @@ export default async function HomePage(props: PageProps<"/">) {
   const showNewsletter = settings.newsletterEnabled && emailConfigured();
 
   return (
+    <SiteShell settings={settings}>
     <div className="mx-auto grid max-w-[1080px] gap-16 px-4 pt-10 sm:gap-20 sm:pt-16">
       <section className="grid max-w-[780px] gap-5">
         <p className="eyebrow-mono ltr text-start">
@@ -102,5 +104,6 @@ export default async function HomePage(props: PageProps<"/">) {
         <ContactCta settings={settings} title={settings.collabTitle} text={settings.collabText} button={settings.collabButton} place="home" />
       </section>
     </div>
+    </SiteShell>
   );
 }

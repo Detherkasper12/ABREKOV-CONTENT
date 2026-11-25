@@ -127,3 +127,86 @@ export function claudeMd(template, fileUrl, fileSize) {
     ],
   };
 }
+
+// DROP-style lead magnet for the reel "how to make Claude Code edit your video" (comment keyword "עריכה").
+// Link-only: it is delivered by DM and never listed in the library. Prompts 1-3 are the ones shown in the reel;
+// the sample first-edit prompt is an addition and is labelled as such on the page.
+export const claudeVideoEditing = (() => {
+  const savedN = n;
+  n = 100;
+  const list = (items) => items.map((x) => `- ${x}`).join("\n");
+  const blocks = [
+      t("בסרטון הראיתי איך לגרום ל־Claude Code לערוך לך וידאו. פה יש הכול במקום אחד: כל שלב, כל פרומפט ואיך מגדירים סגנון משלך. תעתיק, תדביק ותתחיל."),
+      t("**מה צריך:** Claude Code על המחשב והסרטונים שלך. את שאר הכלים Claude Code מתקין בעצמו, אתה רק נותן לו את הפרומפט.", "tip"),
+
+      h("שלב 1: Claude Code ותיקייה אחת"),
+      t("תוריד את Claude Code כאפליקציה למחשב ולא כדפדפן. אחרי זה תיצור תיקייה אחת בשם **עריכת AI**, עם שלוש תיקיות בפנים:"),
+      t(
+        list([
+          "**חומר מקורי:** הסרטונים הגולמיים שלך",
+          "**רפרנסים:** סרטונים שאתה אוהב את הסגנון שלהם",
+          "**מוכן:** הסרטונים הערוכים",
+        ]),
+      ),
+      t("תפתח צ'אט חדש ב־Claude Code ותצביע על התיקייה הזאת. זהו, Claude רואה את כל הקבצים שלך."),
+      link("https://code.claude.com/docs/en/overview", "Claude Code", "ההוראות הרשמיות להתקנה"),
+
+      h("שלב 2: הכלים לעריכה"),
+      t("במה Claude יערוך את הסרטון? בכלים שקיימים כבר, והוא מתקין אותם בשבילך. תדביק לו את הפרומפט הזה:"),
+      prompt(
+        "אתה העורך וידאו שלי. תתקין על המחשב שלי את הכלים: Remotion, HyperFrames, FFmpeg, Whisper, yt-dlp (קישורים למטה). תבדוק כל אחד ותגיד לי כשהכול מוכן.",
+        "פרומפט 1: להתקין את הכלים",
+      ),
+      t("Claude ישאל אותך אם לאשר את ההתקנות. תקרא מה הוא מבקש להריץ ורק אז תאשר.", "tip"),
+      t("מה כל כלי עושה:"),
+      t(
+        list([
+          "**Remotion:** יצירת וידאו מקוד",
+          "**HyperFrames:** עוד כלי ליצירת וידאו מקוד",
+          "**FFmpeg:** חיתוך, חיבור והמרה של וידאו ואודיו",
+          "**Whisper:** תמלול דיבור לטקסט, בסיס לכתוביות",
+          "**yt-dlp:** הורדת סרטונים מהרשת, למשל רפרנסים",
+        ]),
+      ),
+      link("https://github.com/remotion-dev/remotion", "Remotion", "github.com/remotion-dev/remotion"),
+      link("https://github.com/heygen-com/hyperframes", "HyperFrames", "github.com/heygen-com/hyperframes"),
+      link("https://github.com/FFmpeg/FFmpeg", "FFmpeg", "github.com/FFmpeg/FFmpeg"),
+      link("https://github.com/openai/whisper", "Whisper", "github.com/openai/whisper"),
+      link("https://github.com/yt-dlp/yt-dlp", "yt-dlp", "github.com/yt-dlp/yt-dlp"),
+
+      h("שלב 3: ללמד אותו את הסגנון שלך"),
+      t("פה ההבדל בין עריכה גנרית לעריכה שנראית כמו שלך. תאסוף סרטונים שאתה אוהב את הסגנון שלהם ותשים אותם בתיקיית **רפרנסים**. אפשר גם לבקש מ־Claude להוריד אותם בשבילך עם yt-dlp."),
+      prompt(
+        "הנה עוד פרומפטים ורפרנסים. תלמד מהם את הסגנון שלי: פונטים, צבעים, כתוביות, מעברים וקצב. תבנה ברנדבוק.",
+        "פרומפט 2: ללמד אותו את הסגנון",
+      ),
+      t("בכל מקרה תן לו גם פרומפטים ורפרנסים משלך. ככל שיש לו יותר חומר ממך, הסגנון שהוא לומד מדויק יותר.", "tip"),
+      t("התוצאה היא **ברנדבוק**: מסמך שמסכם את הפונטים, הצבעים, הכתוביות, המעברים והקצב שלך. מעכשיו Claude עורך לפיו. תקרא אותו, ואם משהו לא נראה לך, תגיד לו מה לשנות."),
+
+      h("עכשיו לערוך"),
+      t("תשים סרטון בתיקיית **חומר מקורי** ותגיד ל־Claude מה לעשות איתו, כמו שמדברים עם עורך אמיתי. דוגמה לעריכה ראשונה (הפרומפט הזה לא מהסרטון, תתאים אותו לסרטון שלך):"),
+      prompt(
+        "תערוך את הסרטון שבתיקיית חומר מקורי לפי הברנדבוק. תוסיף כתוביות ותשמור את התוצאה בתיקיית מוכן.",
+        "דוגמה: עריכה ראשונה",
+      ),
+      t("ואם משהו לא יצא טוב, לא מתחילים מחדש. פשוט תגיד לו מה לתקן, בדיוק כמו לעורך אמיתי:"),
+      prompt("תתקן את זה, ואת זה, והפריים פה יותר גדול.", "פרומפט 3: תיקונים"),
+
+      h("בקצרה"),
+      t("1. תוריד את Claude Code ותיצור תיקיית **עריכת AI** עם חומר מקורי, רפרנסים ומוכן\n2. תדביק לו את הפרומפט הראשון והוא מתקין את הכלים\n3. תן לו רפרנסים ופרומפט שני, והוא בונה את הברנדבוק שלך\n4. תערוך, ותגיד לו מה לתקן עד שזה נראה כמו שלך"),
+  ];
+  n = savedN;
+  return {
+    slug: "claude-video-editing",
+    title: "איך לגרום ל־Claude Code לערוך בשבילך וידאו",
+    description: "שלושה שלבים והפרומפטים מהסרטון: להתקין את Claude Code, לתת לו את הכלים לעריכה וללמד אותו את הסגנון שלך.",
+    label: "LAB",
+    keyword: "עריכה",
+    category: "ai",
+    tags: ["claude-code", "video", "remotion"],
+    kind: "free",
+    featured: false,
+    unlisted: true,
+    blocks,
+  };
+})();

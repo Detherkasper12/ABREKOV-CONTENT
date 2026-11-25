@@ -83,6 +83,9 @@ export function SettingsForm({ initial, emailReady }: { initial: SiteSettings; e
         <F label="כותרת בסוף דף משאב" hint="ריק = הבלוק לא מוצג">{text("resourceCtaTitle")}</F>
         <F label="טקסט בסוף דף משאב">{text("resourceCtaText", { area: true })}</F>
         <F label="כפתור בסוף דף משאב">{text("resourceCtaButton")}</F>
+        <F label="כותרת מנוי (מתחת למדריכים חינמיים)" hint="ריק = הבלוק לא מוצג. הכפתור פותח צ'אט איתך באינסטגרם">{text("memberTitle")}</F>
+        <F label="טקסט מנוי">{text("memberText", { area: true })}</F>
+        <F label="כפתור מנוי">{text("memberButton")}</F>
       </Group>
 
       <Group title="קישורים נוספים">
