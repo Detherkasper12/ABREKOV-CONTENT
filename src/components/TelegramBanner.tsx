@@ -4,7 +4,15 @@ import type { SiteSettings } from "@/lib/settings-schema";
 // a channel link is set in admin settings, so it never renders a dead button.
 // Built for hesitant visitors: it shows what is inside (a chat sample), lists what they get, and
 // removes the worry at the point of the click ("one tap, leave any time").
-export function TelegramBanner({ settings, place }: { settings: SiteSettings; place: "home" | "resource" }) {
+export function TelegramBanner({
+  settings,
+  place,
+  compact = false,
+}: {
+  settings: SiteSettings;
+  place: "home" | "resource";
+  compact?: boolean;
+}) {
   const href = settings.telegramUrl;
   if (!href || (!settings.telegramTitle && !settings.telegramText)) return null;
   const perks = settings.telegramPerks
@@ -12,9 +20,44 @@ export function TelegramBanner({ settings, place }: { settings: SiteSettings; pl
     .map((p) => p.trim())
     .filter(Boolean)
     .slice(0, 4);
+  if (compact) {
+    // The small card for the empty top corner beside the headline on wide screens.
+    return (
+      <aside aria-label="הקהילה בטלגרם" className="tg-banner relative isolate grid gap-4 overflow-hidden rounded-[24px] bg-forest p-5 text-white">
+        <div className="tg-glow" aria-hidden />
+        <span aria-hidden className="grid size-12 place-items-center rounded-full bg-lime text-forest">
+          <svg viewBox="0 0 24 24" className="size-6" fill="currentColor">
+            <path d="M21.9 4.4 18.7 19.6c-.2 1-.9 1.3-1.7.8l-4.8-3.6-2.3 2.3c-.3.3-.5.5-1 .5l.4-4.9 8.9-8c.4-.3-.1-.5-.6-.2L6.6 13 1.9 11.5c-1-.3-1-1 .2-1.5L20.4 2.9c.9-.3 1.6.2 1.5 1.5Z" />
+          </svg>
+        </span>
+        {settings.telegramTitle && <p className="font-display text-[38px] leading-[0.95] text-lime">{settings.telegramTitle}</p>}
+        {perks.length > 0 && (
+          <ul className="grid gap-1.5 text-[15px] font-bold">
+            {perks.slice(0, 3).map((p) => (
+              <li key={p} className="flex items-center gap-2">
+                <span aria-hidden className="size-2 shrink-0 rounded-full bg-lime" />
+                {p}
+              </li>
+            ))}
+          </ul>
+        )}
+        <a
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          data-track="telegram_click"
+          data-track-place={`${place}-corner`}
+          className="tg-cta !min-h-12 !px-5 !text-[17px]"
+        >
+          {settings.telegramButton || "להצטרפות לקהילה"}
+        </a>
+        {settings.telegramNote && <p className="-mt-1 text-[13px] text-white/60">{settings.telegramNote}</p>}
+      </aside>
+    );
+  }
   return (
     <aside
-      aria-label="ערוץ הטלגרם"
+      aria-label="הקהילה בטלגרם"
       className="tg-banner relative isolate overflow-hidden rounded-[28px] bg-forest text-white"
     >
       <div className="tg-glow" aria-hidden />
@@ -50,7 +93,7 @@ export function TelegramBanner({ settings, place }: { settings: SiteSettings; pl
               <svg aria-hidden viewBox="0 0 24 24" className="size-6" fill="currentColor">
                 <path d="M21.9 4.4 18.7 19.6c-.2 1-.9 1.3-1.7.8l-4.8-3.6-2.3 2.3c-.3.3-.5.5-1 .5l.4-4.9 8.9-8c.4-.3-.1-.5-.6-.2L6.6 13 1.9 11.5c-1-.3-1-1 .2-1.5L20.4 2.9c.9-.3 1.6.2 1.5 1.5Z" />
               </svg>
-              {settings.telegramButton || "להצטרפות לערוץ"}
+              {settings.telegramButton || "להצטרפות לקהילה"}
             </a>
             {settings.telegramNote && <p className="text-[15px] text-white/65">{settings.telegramNote}</p>}
           </div>

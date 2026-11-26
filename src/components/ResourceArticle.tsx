@@ -25,7 +25,10 @@ export function ResourceArticle({
   const canBuy = r.kind === "paid" && /^https:\/\//.test(r.checkoutUrl) && (r.priceIls ?? 0) > 0;
 
   return (
-    <article className="mx-auto max-w-[1080px] px-4 pt-8">
+    <article className="relative mx-auto max-w-[1080px] px-4 pt-8">
+      <div className="absolute top-8 left-4 z-10 hidden w-[272px] lg:block">
+        <TelegramBanner settings={settings} place="resource" compact />
+      </div>
       {!r.unlisted && (
         <nav className="mb-6 flex flex-wrap items-center gap-2 text-[14px] text-muted" aria-label="פירורי לחם">
           <Link href="/#library" className="font-bold hover:text-ink">
