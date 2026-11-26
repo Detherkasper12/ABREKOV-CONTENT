@@ -1,5 +1,6 @@
 import { Library } from "@/components/Library";
 import { ContactCta } from "@/components/ContactCta";
+import { TelegramBanner } from "@/components/TelegramBanner";
 import { NewsletterForm } from "@/components/NewsletterForm";
 import { ResourceCard } from "@/components/ResourceCard";
 import { SiteShell } from "@/components/SiteShell";
@@ -67,6 +68,8 @@ export default async function HomePage(props: PageProps<"/">) {
           <p className="card p-6 text-muted">עוד אין פה משאבים. הראשון בדרך.</p>
         )}
       </section>
+
+      <TelegramBanner settings={settings} place="home" />
 
       {showNewsletter && <NewsletterForm title={settings.newsletterTitle} text={settings.newsletterText} />}
 
