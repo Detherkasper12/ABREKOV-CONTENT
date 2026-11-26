@@ -5,7 +5,7 @@ import type { Resource, ResourceSummary } from "@/lib/data";
 import type { SiteSettings } from "@/lib/settings-schema";
 import { ContactCta } from "./ContactCta";
 import { MembershipCta } from "./MembershipCta";
-import { TelegramBanner } from "./TelegramBanner";
+import { JoinCard } from "./JoinCard";
 import { BlockList } from "./blocks/BlockRenderer";
 import { formatPrice, ResourceCard } from "./ResourceCard";
 
@@ -25,7 +25,7 @@ export function ResourceArticle({
   const canBuy = r.kind === "paid" && /^https:\/\//.test(r.checkoutUrl) && (r.priceIls ?? 0) > 0;
 
   return (
-    <article className="mx-auto max-w-[1080px] px-4 pt-8">
+    <article className="mx-auto max-w-[1180px] px-4 pt-8">
       <div className="lg:grid lg:grid-cols-[minmax(0,760px)_1fr] lg:gap-x-10">
       <div className="min-w-0">
       {!r.unlisted && (
@@ -156,7 +156,7 @@ export function ResourceArticle({
       </div>
 
       <div className="mt-16 grid max-w-[760px] gap-5">
-        <TelegramBanner settings={settings} place="resource" />
+        <JoinCard settings={settings} place="resource" />
         {r.kind === "free" && <MembershipCta settings={settings} slug={r.slug} />}
         <ContactCta
           settings={settings}
@@ -169,7 +169,7 @@ export function ResourceArticle({
 
       </div>
       <aside className="hidden lg:flex lg:flex-col lg:gap-8">
-        <TelegramBanner settings={settings} place="resource" compact />
+        <JoinCard settings={settings} place="resource" compact />
         {headings.length > 2 && (
           <nav className="sticky top-20" aria-label="תוכן העניינים">
             <p className="eyebrow mb-2">בדף הזה</p>

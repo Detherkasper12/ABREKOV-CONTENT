@@ -381,18 +381,18 @@ textarea.field.mono {
 }
 }
 
-/* Telegram card: its own aurora palette (violet, pink, orange) so it stands apart from the site. */
+/* Join card: colours come from admin settings through --j-* variables. */
 .tgx {
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  color: #fff;
+  color: var(--j-text);
   background:
-    radial-gradient(circle at 12% 8%, rgba(124, 58, 237, 0.75), transparent 55%),
-    radial-gradient(circle at 95% 18%, rgba(255, 61, 129, 0.6), transparent 50%),
-    radial-gradient(circle at 70% 105%, rgba(255, 159, 28, 0.55), transparent 55%),
-    #14082e;
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.16) inset, 0 24px 60px -24px rgba(124, 58, 237, 0.7);
+    radial-gradient(circle at 12% 8%, color-mix(in srgb, var(--j-g1) 75%, transparent), transparent 55%),
+    radial-gradient(circle at 95% 18%, color-mix(in srgb, var(--j-g2) 55%, transparent), transparent 50%),
+    radial-gradient(circle at 70% 105%, color-mix(in srgb, var(--j-g1) 45%, transparent), transparent 55%),
+    var(--j-bg);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.16) inset, 0 24px 60px -24px color-mix(in srgb, var(--j-g2) 60%, transparent);
 }
 .tgx-cta {
   position: relative;
@@ -403,8 +403,8 @@ textarea.field.mono {
   min-height: 56px;
   padding: 0 28px;
   border-radius: 999px;
-  background: linear-gradient(100deg, #ffd23f, #ff8a3d 55%, #ff4f8b);
-  color: #1d0836;
+  background: linear-gradient(100deg, var(--j-b1), var(--j-b2));
+  color: var(--j-bt);
   font-size: 19px;
   font-weight: 900;
   animation: tgx-pulse 2.4s infinite;
@@ -413,8 +413,8 @@ textarea.field.mono {
 .tgx-cta:hover { transform: translateY(-2px) scale(1.02); }
 .tgx-cta:active { transform: translateY(1px); }
 @keyframes tgx-pulse {
-  0% { box-shadow: 0 0 0 0 rgba(255, 110, 120, 0.55); }
-  70%, 100% { box-shadow: 0 0 0 18px rgba(255, 110, 120, 0); }
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--j-b1) 55%, transparent); }
+  70%, 100% { box-shadow: 0 0 0 18px transparent; }
 }
 .tgx-phone {
   --screen-h: 260px;
@@ -439,7 +439,7 @@ textarea.field.mono {
   width: 34px;
   height: 34px;
   border-radius: 50%;
-  background: conic-gradient(from 200deg, #7c3aed, #ff3d81, #ff9f1c, #2d6bff, #7c3aed);
+  background: conic-gradient(from 200deg, var(--j-g1), var(--j-g2), var(--j-b1), var(--j-g1));
   font-size: 16px;
 }
 .tgx-screen { position: relative; height: var(--screen-h); overflow: hidden; padding: 6px 10px; }
@@ -465,8 +465,8 @@ textarea.field.mono {
   text-align: center;
   font-weight: 900;
   font-size: 15px;
-  color: #1d0836;
-  background: linear-gradient(100deg, #ffd23f, #ff8a3d 55%, #ff4f8b);
+  color: var(--j-bt);
+  background: linear-gradient(100deg, var(--j-b1), var(--j-b2));
   animation: tgx-press 16s infinite;
 }
 .tgx-join::after {
@@ -490,7 +490,7 @@ textarea.field.mono {
   border-radius: 999px;
   white-space: nowrap;
   background: #fff;
-  color: #1d0836;
+  color: #111;
   font-size: 13px;
   font-weight: 900;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
@@ -507,6 +507,17 @@ textarea.field.mono {
   filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.5));
   animation: tgx-cursor 16s infinite;
 }
+.tgx-ava img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+.tgx-ticks { display: block; text-align: end; margin-top: 2px; font-size: 11px; letter-spacing: -2px; color: #53bdeb; }
+/* WhatsApp look: dark chat, green outgoing bubbles, blue ticks. */
+.tgx-wa .tgx-inner { background: #0b141a; }
+.tgx-wa .tgx-head, .tgx-wa .tgx-joinbar { background: #202c33; }
+.tgx-wa .tgx-screen { background: radial-gradient(circle at 20% 10%, rgba(37, 211, 102, 0.06), transparent 50%), #0b141a; }
+.tgx-wa .tgx-bot { background: #202c33; color: #e9edef; }
+.tgx-wa .tgx-me { background: #005c4b; color: #e9edef; font-weight: 500; }
+.tgx-wa .tgx-inline { background: rgba(255, 255, 255, 0.08); color: #53bdeb; }
+.tgx-plain .tgx-bot { background: rgba(255, 255, 255, 0.12); }
+.tgx-plain .tgx-me { background: rgba(255, 255, 255, 0.9); color: #111; }
 @keyframes tgx-fade { 0% { opacity: 0; } 1.5% { opacity: 1; } 93.75% { opacity: 1; } 97.5%, 100% { opacity: 0; } }
 @keyframes tgx-m1 {
   0%, 3.75% { opacity: 0; max-height: 0; }

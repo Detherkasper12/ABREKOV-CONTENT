@@ -4,6 +4,9 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition, type ReactNode } from "react";
 import type { SiteSettings } from "@/lib/settings-schema";
 import { saveSettings } from "../../actions";
+import { JoinCard } from "@/components/JoinCard";
+import { DEFAULT_SETTINGS } from "@/lib/settings-schema";
+import { UploadButton } from "../resources/[id]/Upload";
 
 function Group({ title, children }: { title: string; children: ReactNode }) {
   return (
@@ -88,13 +91,80 @@ export function SettingsForm({ initial, emailReady }: { initial: SiteSettings; e
         <F label="כפתור מנוי">{text("memberButton")}</F>
       </Group>
 
-      <Group title="ערוץ טלגרם">
-        <F label="קישור לערוץ" hint="ריק = הבאנר לא מוצג בשום מקום. למשל https://t.me/שם_הערוץ">{text("telegramUrl", { ltr: true, placeholder: "https://t.me/" })}</F>
-        <F label="כותרת הבאנר">{text("telegramTitle")}</F>
-        <F label="טקסט הבאנר">{text("telegramText", { area: true })}</F>
-        <F label="מה מקבלים" hint="שורה לכל נקודה, עד 4">{text("telegramPerks", { area: true })}</F>
-        <F label="טקסט הכפתור">{text("telegramButton")}</F>
-        <F label="שורה מרגיעה מתחת לכפתור">{text("telegramNote")}</F>
+      <Group title="כרטיס הצטרפות לקהילה (וואטסאפ / טלגרם)">
+        <div className="grid gap-4 rounded-lg bg-bg p-3">
+          <p className="text-[13px] font-bold text-muted">תצוגה מקדימה חיה (כך זה נראה באתר)</p>
+          <JoinCard settings={s} place="home" preview />
+        </div>
+        <label className="flex items-center gap-2 text-[15px] font-bold">
+          <input type="checkbox" checked={s.joinOn} onChange={(e) => set({ joinOn: e.target.checked })} />
+          להציג את הכרטיס באתר (דף הבית וכל מדריך)
+        </label>
+        <F label="סגנון הצ'אט והאייקון">
+          <select value={s.joinStyle} onChange={(e) => set({ joinStyle: e.target.value as SiteSettings["joinStyle"] })} className="field">
+            <option value="whatsapp">וואטסאפ</option>
+            <option value="telegram">טלגרם</option>
+            <option value="plain">ניטרלי</option>
+          </select>
+        </F>
+        <F label="קישור להצטרפות" hint="ריק = הכרטיס לא מוצג בשום מקום">{text("joinUrl", { ltr: true, placeholder: "https://chat.whatsapp.com/…" })}</F>
+        <F label="לוגו" hint="עיגול קטן בכותרת הכרטיס ובראש הצ'אט. ריק = ניצוץ">
+          <div className="flex flex-wrap items-center gap-3">
+            {s.joinLogo && <img src={s.joinLogo} alt="" className="size-12 rounded-full border border-line object-cover" />}
+            <UploadButton accept="image/png,image/jpeg,image/webp" label={s.joinLogo ? "החלף לוגו" : "העלאת לוגו"} onUploaded={(f) => set({ joinLogo: f.url })} />
+            {s.joinLogo && (
+              <button type="button" className="btn btn-danger" onClick={() => set({ joinLogo: "" })}>
+                הסר
+              </button>
+            )}
+          </div>
+        </F>
+        <F label="כותרת">{text("joinTitle")}</F>
+        <F label="טקסט קצר" hint="מוצג בגרסה הרחבה בתחתית הדף">{text("joinText", { area: true })}</F>
+        <F label="מה מקבלים" hint="שורה לכל נקודה, עד 4">{text("joinPerks", { area: true })}</F>
+        <F label="טקסט הכפתור">{text("joinButton")}</F>
+        <F label="שורה מרגיעה מתחת לכפתור">{text("joinNote")}</F>
+        <F label="שם הקבוצה בראש הצ'אט">{text("joinHeaderName")}</F>
+        <F label="שורת משנה בראש הצ'אט">{text("joinHeaderSub")}</F>
+        <F
+          label="הצ'אט שרץ בתוך הטלפון"
+          hint="5 שורות. שורות 1, 3, 5 הן הודעות של הקבוצה, 2 ו־4 שלך. בשורה 3 אפשר להוסיף אחרי | קוד קצר, ובשורה 5 אחרי | כפתור."
+        >
+          <textarea rows={6} value={s.joinChat} onChange={(e) => set({ joinChat: e.target.value })} className="field" />
+        </F>
+        <F label="הודעה אחרי הלחיצה בצ'אט">{text("joinToast")}</F>
+        <div className="grid gap-3 sm:grid-cols-2">
+          {(
+            [
+              ["joinBg", "רקע"],
+              ["joinGlow1", "זוהר 1"],
+              ["joinGlow2", "זוהר 2"],
+              ["joinBtnFrom", "כפתור: התחלה"],
+              ["joinBtnTo", "כפתור: סוף"],
+              ["joinBtnText", "טקסט הכפתור"],
+              ["joinTextColor", "צבע הטקסט"],
+            ] as const
+          ).map(([key, label]) => (
+            <F key={key} label={label}>
+              <span className="flex items-center gap-2">
+                <input type="color" value={s[key]} onChange={(e) => set({ [key]: e.target.value } as Partial<SiteSettings>)} className="h-10 w-14 cursor-pointer rounded border border-line bg-surface p-1" />
+                <input value={s[key]} onChange={(e) => set({ [key]: e.target.value } as Partial<SiteSettings>)} className="field ltr text-start" dir="ltr" />
+              </span>
+            </F>
+          ))}
+        </div>
+        <button
+          type="button"
+          className="btn w-fit"
+          onClick={() =>
+            setS((p) => ({
+              ...p,
+              ...Object.fromEntries(Object.entries(DEFAULT_SETTINGS).filter(([k]) => k.startsWith("join") && k !== "joinUrl" && k !== "joinLogo")),
+            }))
+          }
+        >
+          איפוס עיצוב וטקסטים לברירת המחדל
+        </button>
       </Group>
 
       <Group title="קישורים נוספים">
