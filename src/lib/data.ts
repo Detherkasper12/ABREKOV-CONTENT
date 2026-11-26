@@ -107,9 +107,19 @@ export async function getById(id: string): Promise<Resource | null> {
   return row ? toResource(row) : null;
 }
 
+const LEGACY_DEFAULTS: Record<string, string> = {
+  telegramUrl: "https://t.me/PROAIABREKOVDESIGN",
+  telegramPerks: "אפליקציה משלנו\nבוט AI שעונה על שאלות\nקורסים וטיפים בחינם",
+  telegramNote: "לחיצה אחת, ואפשר לצאת בכל רגע",
+};
+
 export async function getSettings(): Promise<SiteSettings> {
   const sql = db();
   const [row] = await sql`select data from site_settings where id = 1`;
-  const parsed = settingsSchema.safeParse({ ...DEFAULT_SETTINGS, ...((row?.data as object) ?? {}) });
+  const stored = { ...((row?.data as Record<string, unknown>) ?? {}) };
+  // The settings form saved the old Telegram defaults into the database. Values that still equal
+  // those defaults are replaced by the current ones; anything the owner edited is kept as is.
+  for (const [key, old] of Object.entries(LEGACY_DEFAULTS)) if (stored[key] === old) delete stored[key];
+  const parsed = settingsSchema.safeParse({ ...DEFAULT_SETTINGS, ...stored });
   return parsed.success ? parsed.data : DEFAULT_SETTINGS;
 }
