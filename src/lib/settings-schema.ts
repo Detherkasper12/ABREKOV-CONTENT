@@ -65,7 +65,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   memberTitle: "רוצה גישה מלאה ליותר מ־100 מדריכים?",
   memberText: "מנוי: ‎$25 לחודש. כתוב לי בצ'אט ואסביר איך מצטרפים.",
   memberButton: "לכתוב לי בצ'אט",
-  telegramUrl: "",
+  telegramUrl: "https://t.me/PROAIABREKOVDESIGN",
   telegramTitle: "הכי טוב קורה בערוץ שלנו",
   telegramText: "מה שלא נכנס לאתר ולפוסטים, מחכה לך שם, בחינם.",
   telegramButton: "להצטרפות לערוץ",
