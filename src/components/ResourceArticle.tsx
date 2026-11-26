@@ -5,6 +5,7 @@ import type { Resource, ResourceSummary } from "@/lib/data";
 import type { SiteSettings } from "@/lib/settings-schema";
 import { ContactCta } from "./ContactCta";
 import { MembershipCta } from "./MembershipCta";
+import { TelegramBanner } from "./TelegramBanner";
 import { BlockList } from "./blocks/BlockRenderer";
 import { formatPrice, ResourceCard } from "./ResourceCard";
 
@@ -153,6 +154,7 @@ export function ResourceArticle({
       </div>
 
       <div className="mt-16 grid max-w-[760px] gap-5">
+        <TelegramBanner settings={settings} place="resource" />
         {r.kind === "free" && <MembershipCta settings={settings} slug={r.slug} />}
         <ContactCta
           settings={settings}

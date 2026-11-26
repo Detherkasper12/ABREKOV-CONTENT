@@ -88,6 +88,13 @@ export function SettingsForm({ initial, emailReady }: { initial: SiteSettings; e
         <F label="כפתור מנוי">{text("memberButton")}</F>
       </Group>
 
+      <Group title="ערוץ טלגרם">
+        <F label="קישור לערוץ" hint="ריק = הבאנר לא מוצג בשום מקום. למשל https://t.me/שם_הערוץ">{text("telegramUrl", { ltr: true, placeholder: "https://t.me/" })}</F>
+        <F label="כותרת הבאנר">{text("telegramTitle")}</F>
+        <F label="טקסט הבאנר">{text("telegramText", { area: true })}</F>
+        <F label="טקסט הכפתור">{text("telegramButton")}</F>
+      </Group>
+
       <Group title="קישורים נוספים">
         {s.socials.map((l, i) => (
           <div key={i} className="flex flex-wrap gap-2">
