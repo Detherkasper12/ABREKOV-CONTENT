@@ -89,7 +89,7 @@ export function SettingsForm({ initial, emailReady }: { initial: SiteSettings; e
       </Group>
 
       <Group title="ערוץ טלגרם">
-        <F label="קישור לערוץ" hint="ריק = הבאנר לא מוצג בשום מקום. למשל https://t.me/שם_הערוץ">{text("telegramUrl", { ltr: true, placeholder: "https://t.me/" })}</F>
+        <F label="קישור לקבוצת וואטסאפ" hint="ריק = הבאנר לא מוצג בשום מקום. למשל https://chat.whatsapp.com/…">{text("telegramUrl", { ltr: true, placeholder: "https://chat.whatsapp.com/" })}</F>
         <F label="כותרת הבאנר">{text("telegramTitle")}</F>
         <F label="טקסט הבאנר">{text("telegramText", { area: true })}</F>
         <F label="מה מקבלים" hint="שורה לכל נקודה, עד 4">{text("telegramPerks", { area: true })}</F>

@@ -20,11 +20,9 @@ export default async function HomePage(props: PageProps<"/">) {
 
   return (
     <SiteShell settings={settings}>
-    <div className="relative mx-auto grid max-w-[1080px] gap-16 px-4 pt-10 sm:gap-20 sm:pt-16">
-      <div className="absolute top-16 left-4 z-10 hidden w-[272px] lg:block">
-        <TelegramBanner settings={settings} place="home" compact />
-      </div>
-      <section className="grid max-w-[780px] gap-5 lg:max-w-[740px]">
+    <div className="mx-auto grid max-w-[1180px] gap-16 px-4 pt-10 sm:gap-20 sm:pt-16">
+      <div className="lg:grid lg:grid-cols-[minmax(0,740px)_1fr] lg:items-start lg:gap-10">
+      <section className="grid max-w-[780px] gap-5 lg:max-w-none">
         <p className="eyebrow-mono ltr text-start">
           Resources · <span className="normal-case">@{settings.instagramHandle}</span>
         </p>
@@ -42,6 +40,10 @@ export default async function HomePage(props: PageProps<"/">) {
           )}
         </div>
       </section>
+      <div className="hidden lg:block">
+        <TelegramBanner settings={settings} place="home" compact />
+      </div>
+      </div>
 
       {featured.length > 0 && (
         <section className="grid gap-5" aria-labelledby="featured-title">
