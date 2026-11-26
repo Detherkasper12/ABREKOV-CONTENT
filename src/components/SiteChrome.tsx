@@ -8,7 +8,7 @@ export function instagramUrl(handle: string) {
 export function SiteHeader({ settings, isolated = false }: { settings: SiteSettings; isolated?: boolean }) {
   return (
     <header className="sticky top-0 z-20 border-b border-line bg-bg/90 backdrop-blur-sm">
-      <div className="mx-auto flex h-14 max-w-[1080px] items-center justify-between gap-4 px-4">
+      <div className="mx-auto flex h-14 max-w-[1180px] items-center justify-between gap-4 px-4">
         {isolated ? (
           <span className="sig text-[15px]">
             <i />
@@ -56,7 +56,7 @@ export function SiteFooter({ settings }: { settings: SiteSettings }) {
   ].filter(Boolean) as { label: string; url: string }[];
   return (
     <footer className="mt-20 bg-forest text-[#e4e7e4]">
-      <div className="mx-auto flex max-w-[1080px] flex-wrap items-center justify-between gap-6 px-4 py-10">
+      <div className="mx-auto flex max-w-[1180px] flex-wrap items-center justify-between gap-6 px-4 py-10">
         <span className="sig text-[15px] text-[#e4e7e4]">
           <i />
           ABREKOV
