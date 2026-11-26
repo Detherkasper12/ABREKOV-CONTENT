@@ -381,101 +381,201 @@ textarea.field.mono {
 }
 }
 
-/* Telegram banner */
-.tg-banner {
-  box-shadow: 0 0 0 2px var(--color-lime) inset;
+/* Telegram card: its own aurora palette (violet, pink, orange) so it stands apart from the site. */
+.tgx {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  color: #fff;
+  background:
+    radial-gradient(circle at 12% 8%, rgba(124, 58, 237, 0.75), transparent 55%),
+    radial-gradient(circle at 95% 18%, rgba(255, 61, 129, 0.6), transparent 50%),
+    radial-gradient(circle at 70% 105%, rgba(255, 159, 28, 0.55), transparent 55%),
+    #14082e;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.16) inset, 0 24px 60px -24px rgba(124, 58, 237, 0.7);
 }
-.tg-glow {
-  position: absolute;
-  inset-block-start: -40%;
-  inset-inline-end: -10%;
-  width: 70%;
-  aspect-ratio: 1;
-  background: radial-gradient(closest-side, rgba(214, 255, 58, 0.22), transparent);
-  z-index: -1;
-}
-.tg-cta {
+.tgx-cta {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  min-height: 60px;
-  padding: 0 32px;
+  gap: 10px;
+  min-height: 56px;
+  padding: 0 28px;
   border-radius: 999px;
-  background: var(--color-lime);
-  color: var(--color-forest);
-  font-size: 20px;
-  font-weight: 800;
-  box-shadow: 0 5px 0 #8fa81f;
-  transition: transform 0.15s, box-shadow 0.15s;
+  background: linear-gradient(100deg, #ffd23f, #ff8a3d 55%, #ff4f8b);
+  color: #1d0836;
+  font-size: 19px;
+  font-weight: 900;
+  animation: tgx-pulse 2.4s infinite;
+  transition: transform 0.15s;
 }
-.tg-cta:hover {
-  transform: translateY(2px);
-  box-shadow: 0 3px 0 #8fa81f;
+.tgx-cta:hover { transform: translateY(-2px) scale(1.02); }
+.tgx-cta:active { transform: translateY(1px); }
+@keyframes tgx-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(255, 110, 120, 0.55); }
+  70%, 100% { box-shadow: 0 0 0 18px rgba(255, 110, 120, 0); }
 }
-.tg-cta:active {
-  transform: translateY(5px);
-  box-shadow: 0 0 0 #8fa81f;
+.tgx-phone {
+  --screen-h: 260px;
+  position: relative;
+  width: 100%;
+  border-radius: 28px;
+  background: #0d0620;
+  padding: 7px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.14);
 }
-@media (max-width: 640px) {
-  .tg-cta {
-    width: 100%;
-  }
+.tgx-inner { overflow: hidden; border-radius: 22px; background: #1a0d3d; position: relative; }
+.tgx-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.07);
 }
-.tg-phone {
-  background: #eef3ee;
-  color: var(--color-ink);
-  border-radius: 24px;
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
-  overflow: hidden;
-}
-@media (min-width: 768px) {
-  .tg-phone {
-    transform: rotate(-3deg);
-  }
-}
-.tg-bubble {
-  max-width: 85%;
-  padding: 9px 13px;
-  border-radius: 16px;
-  font-size: 15px;
-  line-height: 1.45;
-}
-.tg-bubble-me {
-  justify-self: start;
-  background: var(--color-lime);
-  color: var(--color-forest);
-  font-weight: 700;
-  border-end-start-radius: 4px;
-}
-.tg-bubble-bot {
-  justify-self: end;
-  background: #fff;
-  border-end-end-radius: 4px;
-}
-.tg-typing {
-  display: inline-flex;
-  gap: 5px;
-  padding: 12px 14px;
-}
-.tg-typing i {
-  width: 7px;
-  height: 7px;
+.tgx-ava {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
-  background: var(--color-forest);
-  opacity: 0.35;
-  animation: tg-dot 1.2s infinite;
+  background: conic-gradient(from 200deg, #7c3aed, #ff3d81, #ff9f1c, #2d6bff, #7c3aed);
+  font-size: 16px;
 }
-.tg-typing i:nth-child(2) {
-  animation-delay: 0.2s;
+.tgx-screen { position: relative; height: var(--screen-h); overflow: hidden; padding: 6px 10px; }
+.tgx-chat { height: 100%; display: flex; flex-direction: column; justify-content: flex-end; animation: tgx-fade 16s infinite; }
+.tgx-row { overflow: hidden; max-height: 0; opacity: 0; display: grid; }
+.tgx-msg { margin: 4px 0; max-width: 86%; padding: 8px 12px; border-radius: 16px; font-size: 14px; line-height: 1.4; }
+.tgx-bot { justify-self: end; background: rgba(255, 255, 255, 0.13); border-end-end-radius: 4px; }
+.tgx-me { justify-self: start; background: linear-gradient(120deg, #ff7aa8, #ffb35c); color: #2a0f45; font-weight: 700; border-end-start-radius: 4px; }
+.tgx-code { display: block; margin-top: 6px; padding: 4px 8px; border-radius: 8px; background: rgba(0, 0, 0, 0.3); font-family: var(--font-mono), monospace; font-size: 12px; direction: ltr; text-align: left; }
+.tgx-inline { display: block; margin-top: 7px; padding: 6px 10px; border-radius: 10px; background: rgba(255, 255, 255, 0.16); text-align: center; font-weight: 800; }
+.tgx-dots { display: flex; gap: 5px; padding: 11px 13px; }
+.tgx-dots i { width: 7px; height: 7px; border-radius: 50%; background: #fff; opacity: 0.4; animation: tgx-dot 1.1s infinite; }
+.tgx-dots i:nth-child(2) { animation-delay: 0.18s; }
+.tgx-dots i:nth-child(3) { animation-delay: 0.36s; }
+@keyframes tgx-dot { 0%, 60%, 100% { opacity: 0.35; transform: none; } 30% { opacity: 1; transform: translateY(-3px); } }
+.tgx-joinbar { padding: 8px 10px 10px; background: rgba(255, 255, 255, 0.05); }
+.tgx-join {
+  position: relative;
+  overflow: hidden;
+  display: block;
+  padding: 10px;
+  border-radius: 12px;
+  text-align: center;
+  font-weight: 900;
+  font-size: 15px;
+  color: #1d0836;
+  background: linear-gradient(100deg, #ffd23f, #ff8a3d 55%, #ff4f8b);
+  animation: tgx-press 16s infinite;
 }
-.tg-typing i:nth-child(3) {
-  animation-delay: 0.4s;
+.tgx-join::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.75);
+  opacity: 0;
+  animation: tgx-ripple 16s infinite;
 }
-@keyframes tg-dot {
-  0%, 60%, 100% { opacity: 0.35; transform: none; }
-  30% { opacity: 1; transform: translateY(-3px); }
+.tgx-toast {
+  position: absolute;
+  left: 50%;
+  top: 10px;
+  transform: translate(-50%, -140%);
+  padding: 8px 14px;
+  border-radius: 999px;
+  white-space: nowrap;
+  background: #fff;
+  color: #1d0836;
+  font-size: 13px;
+  font-weight: 900;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  animation: tgx-toast 16s infinite;
+}
+.tgx-cursor {
+  position: absolute;
+  z-index: 3;
+  width: 26px;
+  height: 26px;
+  left: 78%;
+  top: 60%;
+  opacity: 0;
+  filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.5));
+  animation: tgx-cursor 16s infinite;
+}
+@keyframes tgx-fade { 0% { opacity: 0; } 1.5% { opacity: 1; } 93.75% { opacity: 1; } 97.5%, 100% { opacity: 0; } }
+@keyframes tgx-m1 {
+  0%, 3.75% { opacity: 0; max-height: 0; }
+  6.15%, 96% { opacity: 1; max-height: 140px; }
+  97%, 100% { opacity: 0; max-height: 0; }
+}
+@keyframes tgx-m2 {
+  0%, 12.5% { opacity: 0; max-height: 0; }
+  14.9%, 96% { opacity: 1; max-height: 140px; }
+  97%, 100% { opacity: 0; max-height: 0; }
+}
+@keyframes tgx-t1 {
+  0%, 18.75% { opacity: 0; max-height: 0; }
+  20.35%, 26.9% { opacity: 1; max-height: 44px; }
+  27.5%, 100% { opacity: 0; max-height: 0; }
+}
+@keyframes tgx-m3 {
+  0%, 27.5% { opacity: 0; max-height: 0; }
+  29.9%, 96% { opacity: 1; max-height: 140px; }
+  97%, 100% { opacity: 0; max-height: 0; }
+}
+@keyframes tgx-m4 {
+  0%, 40.0% { opacity: 0; max-height: 0; }
+  42.4%, 96% { opacity: 1; max-height: 140px; }
+  97%, 100% { opacity: 0; max-height: 0; }
+}
+@keyframes tgx-t2 {
+  0%, 46.25% { opacity: 0; max-height: 0; }
+  47.85%, 54.4% { opacity: 1; max-height: 44px; }
+  55.0%, 100% { opacity: 0; max-height: 0; }
+}
+@keyframes tgx-m5 {
+  0%, 55.0% { opacity: 0; max-height: 0; }
+  57.4%, 96% { opacity: 1; max-height: 140px; }
+  97%, 100% { opacity: 0; max-height: 0; }
+}
+.tgx-row-m1 { animation: tgx-m1 16s infinite ease-out; }
+.tgx-row-m2 { animation: tgx-m2 16s infinite ease-out; }
+.tgx-row-m3 { animation: tgx-m3 16s infinite ease-out; }
+.tgx-row-m4 { animation: tgx-m4 16s infinite ease-out; }
+.tgx-row-m5 { animation: tgx-m5 16s infinite ease-out; }
+.tgx-row-t1 { animation: tgx-t1 16s infinite ease-out; }
+.tgx-row-t2 { animation: tgx-t2 16s infinite ease-out; }
+@keyframes tgx-cursor {
+  0%, 61.25% { opacity: 0; left: 80%; top: 55%; transform: scale(1); }
+  64.38% { opacity: 1; left: 80%; top: 55%; }
+  73.75% { opacity: 1; left: 52%; top: 91%; transform: scale(1); }
+  75.0% { opacity: 1; left: 52%; top: 91%; transform: scale(0.8); }
+  76.56% { opacity: 1; left: 52%; top: 91%; transform: scale(1); }
+  90.0% { opacity: 1; left: 52%; top: 91%; }
+  93.12%, 100% { opacity: 0; left: 52%; top: 91%; }
+}
+@keyframes tgx-press {
+  0%, 74.06% { transform: none; filter: none; }
+  75.0% { transform: scale(0.95); filter: brightness(1.15); }
+  76.88%, 100% { transform: none; filter: none; }
+}
+@keyframes tgx-ripple {
+  0%, 74.69% { opacity: 0; transform: scale(0.3); }
+  75.0% { opacity: 0.7; transform: scale(0.3); }
+  79.38%, 100% { opacity: 0; transform: scale(5); }
+}
+@keyframes tgx-toast {
+  0%, 76.25% { transform: translate(-50%, -140%); opacity: 0; }
+  79.38%, 90.62% { transform: translate(-50%, 0); opacity: 1; }
+  93.75%, 100% { transform: translate(-50%, -140%); opacity: 0; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .tg-typing i { animation: none; }
+  .tgx-cta, .tgx-chat, .tgx-join, .tgx-join::after, .tgx-dots i, .tgx-cursor, .tgx-toast, .tgx-row { animation: none !important; }
+  .tgx-row { max-height: none; opacity: 1; }
+  .tgx-row-t1, .tgx-row-t2, .tgx-cursor, .tgx-toast { display: none; }
 }

@@ -25,10 +25,9 @@ export function ResourceArticle({
   const canBuy = r.kind === "paid" && /^https:\/\//.test(r.checkoutUrl) && (r.priceIls ?? 0) > 0;
 
   return (
-    <article className="relative mx-auto max-w-[1080px] px-4 pt-8">
-      <div className="absolute top-8 left-4 z-10 hidden w-[272px] lg:block">
-        <TelegramBanner settings={settings} place="resource" compact />
-      </div>
+    <article className="mx-auto max-w-[1080px] px-4 pt-8">
+      <div className="lg:grid lg:grid-cols-[minmax(0,760px)_1fr] lg:gap-x-10">
+      <div className="min-w-0">
       {!r.unlisted && (
         <nav className="mb-6 flex flex-wrap items-center gap-2 text-[14px] text-muted" aria-label="פירורי לחם">
           <Link href="/#library" className="font-bold hover:text-ink">
@@ -130,13 +129,13 @@ export function ResourceArticle({
         </div>
       )}
 
-      <div className="mt-10 grid gap-10 lg:grid-cols-[minmax(0,760px)_1fr]">
+      <div className="mt-10 grid gap-10">
         <div className="min-w-0">
           {r.kind === "paid" && r.blocks.length > 0 && <p className="eyebrow mb-4">תצוגה מקדימה</p>}
           <BlockList blocks={r.blocks} />
         </div>
         {headings.length > 2 && (
-          <aside className="order-first lg:order-none">
+          <aside className="order-first lg:hidden">
             <nav
               className="card p-4 lg:sticky lg:top-20 lg:border-0 lg:bg-transparent lg:p-0"
               aria-label="תוכן העניינים"
@@ -166,6 +165,26 @@ export function ResourceArticle({
           button={settings.resourceCtaButton}
           place="resource"
         />
+      </div>
+
+      </div>
+      <aside className="hidden lg:flex lg:flex-col lg:gap-8">
+        <TelegramBanner settings={settings} place="resource" compact />
+        {headings.length > 2 && (
+          <nav className="sticky top-20" aria-label="תוכן העניינים">
+            <p className="eyebrow mb-2">בדף הזה</p>
+            <ol className="grid gap-1.5 text-[15px]">
+              {headings.map((h) => (
+                <li key={h.id}>
+                  <a href={`#${headingAnchor(h)}`} className="text-muted hover:text-ink">
+                    {h.text}
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </nav>
+        )}
+      </aside>
       </div>
 
       {!r.unlisted && related.length > 0 && (
