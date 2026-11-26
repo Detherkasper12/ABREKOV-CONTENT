@@ -20,8 +20,11 @@ export default async function HomePage(props: PageProps<"/">) {
 
   return (
     <SiteShell settings={settings}>
-    <div className="mx-auto grid max-w-[1080px] gap-16 px-4 pt-10 sm:gap-20 sm:pt-16">
-      <section className="grid max-w-[780px] gap-5">
+    <div className="relative mx-auto grid max-w-[1080px] gap-16 px-4 pt-10 sm:gap-20 sm:pt-16">
+      <div className="absolute top-16 left-4 z-10 hidden w-[272px] lg:block">
+        <TelegramBanner settings={settings} place="home" compact />
+      </div>
+      <section className="grid max-w-[780px] gap-5 lg:max-w-[740px]">
         <p className="eyebrow-mono ltr text-start">
           Resources · <span className="normal-case">@{settings.instagramHandle}</span>
         </p>
