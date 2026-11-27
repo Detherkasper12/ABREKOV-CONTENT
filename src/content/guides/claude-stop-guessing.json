@@ -1,0 +1,178 @@
+{
+ "slug": "claude-stop-guessing",
+ "title": "למה \"תעשה יפה\" נותן זבל, ו־3 דרכים לתקן את זה",
+ "description": "שלושה דברים שגורמים ל־Claude להפסיק לנחש: קבצי md, רפרנסים והגדרה של \"הצלחה\". כל הפרומפטים מהסרטון ותבנית design.md להעתקה.",
+ "label": "LAB",
+ "keyword": "סוכן",
+ "category": "ai",
+ "tags": [
+  "claude",
+  "claude-code",
+  "prompts",
+  "design"
+ ],
+ "kind": "free",
+ "featured": false,
+ "unlisted": true,
+ "blocks": [
+  {
+   "type": "text",
+   "text": "**מה צריך:** Claude Code על המחשב. הפרומפטים עובדים גם בצ'אט רגיל עם Claude. תבנית design.md מצורפת להורדה.",
+   "variant": "tip",
+   "id": "stopg001"
+  },
+  {
+   "type": "text",
+   "text": "אתה כותב ל־Claude \"תבנה לי מערכת\" או \"תעשה יפה\", ומקבל משהו גנרי. הסיבה פשוטה: הוא חייב לנחש איזה סגנון, איזה צבעים ומה בכלל המטרה. פה יש 3 דרכים להפסיק את הניחושים, עם כל הפרומפטים מהסרטון.",
+   "variant": "plain",
+   "id": "stopg002"
+  },
+  {
+   "type": "heading",
+   "text": "01‏ · קבצי md",
+   "level": 2,
+   "id": "stopg003"
+  },
+  {
+   "type": "text",
+   "text": "**התיעוד של הפרויקט.** כל קובץ שנגמר ב־.md הוא קובץ טקסט פשוט עם החוקים והתיעוד של הפרויקט שלך. בלעדיהם Claude מתחיל לנחש מאפס בכל פעם מחדש.",
+   "variant": "plain",
+   "id": "stopg004"
+  },
+  {
+   "type": "text",
+   "text": "- **CLAUDE.md:** החוקים של הפרויקט. Claude Code טוען אותו לבד בתחילת כל סשן.\n- **design.md:** הצבעים, הפונטים והמרווחים שלך.",
+   "variant": "plain",
+   "id": "stopg005"
+  },
+  {
+   "type": "text",
+   "text": "Claude Code טוען לבד רק את CLAUDE.md. כדי שהוא יקרא גם את design.md, תוסיף ל־CLAUDE.md את השורה `@design.md`.",
+   "variant": "tip",
+   "id": "stopg006"
+  },
+  {
+   "type": "prompt",
+   "title": "פרומפט: לסרוק את הפרויקט ולכתוב CLAUDE.md",
+   "text": "תסרוק את הפרויקט ותסביר לי מה כל קובץ ותיקייה אחראים עליו. אחרי זה תכתוב CLAUDE.md בשורש הפרויקט: מה הפרויקט, הפקודות, מבנה התיקיות והחוקים. תפרט כמה שיותר, ותשאל אותי על כל מה שלא ברור לך מהקוד.",
+   "id": "stopg007"
+  },
+  {
+   "type": "prompt",
+   "title": "פרומפט: לכתוב design.md",
+   "text": "תיצור קובץ design.md בשורש הפרויקט לפי התבנית שצירפתי: צבעים עם קודי HEX, פונטים, גדלי טקסט, מרווחים, פינות ואנימציות. אם כבר יש עיצוב בפרויקט, תוציא את הערכים מהקוד. מה שחסר, תשאל אותי. בסוף תוסיף ל־CLAUDE.md את השורה @design.md",
+   "id": "stopg008"
+  },
+  {
+   "type": "file",
+   "label": "הורד את design.md",
+   "url": "/downloads/design.md",
+   "fileName": "design.md",
+   "size": 1553,
+   "id": "stopg009"
+  },
+  {
+   "type": "code",
+   "title": "design.md",
+   "language": "markdown",
+   "code": "# design.md\n\nDesign rules for this project. Template by @abrekov.design.\nReplace everything in [square brackets] and delete what doesn't apply.\nClaude Code only auto-loads CLAUDE.md, so add this line to CLAUDE.md: @design.md\n\n## Feel\n\n- In three words: [calm, premium, bold]\n- Looks like: [link or screenshot of a reference]. What I like about it: [lots of white space, huge headings]\n- Never: [gradients, stock photos, emoji in the UI]\n\n## Colors\n\n- Background: [#0E0E0E]\n- Surface (cards): [#1A1A1A]\n- Text: [#F5F5F5]. Secondary text: [#A3A3A3]\n- Brand / main action: [#D7FF3A]\n- Error: [#FF4D4D]. Success: [#3DDC84]\n- Use only these colors. If you need a new one, ask me first.\n\n## Typography\n\n- Font: [Heebo] for headings and body\n- Sizes: H1 [56px], H2 [36px], H3 [24px], body [17px], small [14px]\n- Weights: headings [700], body [400]\n- Line height: headings [1.1], body [1.6]\n\n## Spacing and shape\n\n- Spacing scale: [4, 8, 12, 16, 24, 32, 48, 64]. No other values.\n- Page side padding: mobile [16px], desktop [64px]\n- Max content width: [1200px]\n- Corner radius: buttons [999px], cards [20px], inputs [12px]\n- Shadows: [none, use borders instead]\n\n## Components\n\n- Primary button: [brand background, dark text, full rounded]\n- Secondary button: [transparent, 1px border]\n- Cards: [surface color, 20px radius, 24px padding]\n\n## Motion\n\n- Duration: [200ms] for small UI, [400ms] for page elements\n- Easing: [ease-out]\n- Respect prefers-reduced-motion\n\n## Language and direction\n\n- [Hebrew, RTL. Use logical properties (start/end), not left/right.]\n",
+   "id": "stopg010"
+  },
+  {
+   "type": "text",
+   "text": "אין לך עדיין פרויקט? זה עובד גם בהתחלה: תתאר ל־Claude מה אתה בונה ותבקש ממנו לכתוב את שני הקבצים לפני שורת הקוד הראשונה.",
+   "variant": "tip",
+   "id": "stopg011"
+  },
+  {
+   "type": "link",
+   "url": "/resources/claude-md-template",
+   "title": "תבנית CLAUDE.md",
+   "description": "תבנית מלאה להעתקה ומדריך קצר",
+   "id": "stopg012"
+  },
+  {
+   "type": "heading",
+   "text": "02‏ · רפרנסים",
+   "level": 2,
+   "id": "stopg013"
+  },
+  {
+   "type": "text",
+   "text": "**דוגמה במקום מילים.** כל מודל של Claude עובד הרבה יותר טוב כשנותנים לו דוגמה קונקרטית: צילום מסך של אתר שאהבת, קישור או תמונה. ב־Claude Code אפשר פשוט לגרור צילום מסך לצ'אט.",
+   "variant": "plain",
+   "id": "stopg014"
+  },
+  {
+   "type": "text",
+   "text": "במקום \"תעשה יפה\", תגיד \"תעשה דומה לזה, אבל עם הצבעים והסטייל שלי\". ותסביר מה אהבת ברפרנס.",
+   "variant": "plain",
+   "id": "stopg015"
+  },
+  {
+   "type": "prompt",
+   "title": "פרומפט: רפרנס במקום \"תעשה יפה\"",
+   "text": "תעשה דומה לזה [צילום מסך / קישור], אבל עם הצבעים והסטייל שלי מ־design.md.\nמה אהבתי ברפרנס: [למשל: הרבה מקום לבן, כותרות ענקיות, כפתורים עגולים]\nמה לא לקחת ממנו: [למשל: הצבעים, התמונות, הטקסטים]",
+   "id": "stopg016"
+  },
+  {
+   "type": "text",
+   "text": "\"דומה לזה\" לבד הוא עדיין ניחוש: אולי אהבת את הצבעים, ואולי את הפריסה. ככל שתסביר יותר מה אהבת, Claude יפגע יותר מדויק.",
+   "variant": "tip",
+   "id": "stopg017"
+  },
+  {
+   "type": "heading",
+   "text": "03‏ · מה נחשב \"הצלחה\"",
+   "level": 2,
+   "id": "stopg018"
+  },
+  {
+   "type": "text",
+   "text": "**הגדרה לפני שמתחילים.** עוד לפני שמתחילים את הפרויקט, תסביר ל־Claude מה מבחינתך ייחשב הצלחה. כשאין הגדרה של \"הצלחה\", זה סתם ניחושים.",
+   "variant": "plain",
+   "id": "stopg019"
+  },
+  {
+   "type": "text",
+   "text": "למשל: \"אני רוצה שמסך הפתיחה יהיה אנימציה של הלוגו באדום, עם קפיצה קטנה בסוף.\"",
+   "variant": "plain",
+   "id": "stopg020"
+  },
+  {
+   "type": "prompt",
+   "title": "פרומפט: להגדיר הצלחה",
+   "text": "לפני שאתה מתחיל, הנה מה שייחשב הצלחה:\n1. [מה רואים על המסך ומה המשתמש עושה]\n2. [איך זה מרגיש: למשל מהיר, מינימליסטי, משחקי]\n3. [מה חייב לעבוד: למשל מובייל, עברית מימין לשמאל]\n4. [מה אסור: למשל בלי ספריות חדשות]\nתחזור אליי קודם עם תוכנית קצרה. בסוף העבודה תבדוק את התוצאה מול הרשימה הזאת, סעיף אחרי סעיף.",
+   "id": "stopg021"
+  },
+  {
+   "type": "divider",
+   "id": "stopg022"
+  },
+  {
+   "type": "heading",
+   "text": "בקצרה",
+   "level": 2,
+   "id": "stopg023"
+  },
+  {
+   "type": "text",
+   "text": "1. **קבצי md:** CLAUDE.md לחוקים ו־design.md לעיצוב\n2. **רפרנסים:** דוגמה קונקרטית, ומה בדיוק אהבת בה\n3. **הצלחה:** רשימה של מה זה \"טוב\" עוד לפני שמתחילים",
+   "variant": "plain",
+   "id": "stopg024"
+  },
+  {
+   "type": "text",
+   "text": "Claude לא קורא מחשבות. כל דקה שאתה משקיע בהסבר חוסכת לך סבב של תיקונים.",
+   "variant": "tip",
+   "id": "stopg025"
+  },
+  {
+   "type": "link",
+   "url": "https://code.claude.com/docs/en/memory",
+   "title": "התיעוד הרשמי של Claude Code",
+   "description": "איך CLAUDE.md נטען ואיך מייבאים קבצים עם @",
+   "id": "stopg026"
+  }
+ ]
+}

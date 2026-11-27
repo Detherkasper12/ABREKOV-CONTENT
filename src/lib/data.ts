@@ -74,6 +74,8 @@ export async function listPublished(): Promise<ResourceSummary[]> {
 }
 
 export async function getPublishedBySlug(slug: string): Promise<Resource | null> {
+  // A DM link can be the first request a fresh instance gets, so make sure bundled guides exist.
+  await ensureSchema();
   const sql = db();
   const [row] = await sql`select * from resources where slug = ${slug} and status = 'published'`;
   return row ? toResource(row) : null;
