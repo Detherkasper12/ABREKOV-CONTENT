@@ -1,5 +1,6 @@
 import "server-only";
 import postgres from "postgres";
+import { seedBundledGuides } from "./bundled-guides";
 
 type Sql = ReturnType<typeof postgres>;
 const globalForDb = globalThis as unknown as { __abrekovSql?: Sql };
@@ -33,6 +34,7 @@ export function db(): Sql {
 
 // Additive columns added after the first release (supabase/migrations/0002_resource_file.sql, 0003_unlisted.sql).
 // Applied once per server instance before the first read or write, so a deploy never waits on a manual SQL step.
+// Guides bundled in the repo are seeded right after (see bundled-guides.ts).
 let schemaReady: Promise<unknown> | undefined;
 export function ensureSchema() {
   schemaReady ??= db()
@@ -42,6 +44,7 @@ export function ensureSchema() {
        alter table resources add column if not exists file_size bigint not null default 0;
        alter table resources add column if not exists unlisted boolean not null default false;`,
     )
+    .then(() => seedBundledGuides(db()))
     .catch((e) => {
       schemaReady = undefined;
       throw e;
