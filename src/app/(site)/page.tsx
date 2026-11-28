@@ -9,8 +9,8 @@ import { getSettings, listPublished } from "@/lib/data";
 import { splitPairs } from "@/lib/home-schema";
 import { consentFor, WAITLISTS } from "@/lib/waitlist";
 
-// Static, rebuilt on every admin save (and at most hourly as a fallback).
-export const revalidate = 3600;
+// Rendered per request from cached data (see lib/data.ts), so no page waits on the database.
+export const dynamic = "force-dynamic";
 export const metadata = { alternates: { canonical: "/" } };
 
 const HOME_GUIDES = 6;

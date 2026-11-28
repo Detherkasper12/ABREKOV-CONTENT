@@ -7,8 +7,8 @@ import { getSettings, listPublished } from "@/lib/data";
 import { paletteVars } from "@/lib/palette";
 import { consentFor, WAITLISTS } from "@/lib/waitlist";
 
-// Static, rebuilt on every admin save (and at most hourly as a fallback).
-export const revalidate = 3600;
+// Rendered per request from cached data (see lib/data.ts), so no page waits on the database.
+export const dynamic = "force-dynamic";
 const w = WAITLISTS.learn;
 export const metadata = waitlistMetadata(w);
 

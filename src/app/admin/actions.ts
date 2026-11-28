@@ -1,12 +1,12 @@
 "use server";
 
 import { randomBytes } from "node:crypto";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { requireAdmin, isAdminEmail } from "@/lib/auth";
 import { db, ensureSchema } from "@/lib/db";
-import { getById } from "@/lib/data";
+import { CONTENT_TAG, getById } from "@/lib/data";
 import { publishProblems, resourceInputSchema, type ResourceInput } from "@/lib/resource-schema";
 import { settingsSchema, type SiteSettings } from "@/lib/settings-schema";
 import { createAuthClient, createStorageAdmin, MEDIA_BUCKET } from "@/lib/supabase/server";
@@ -24,6 +24,7 @@ function firstIssue(error: z.ZodError) {
 // Public pages are static. Any content change can show up on several pages (home rows, related guides),
 // so every save rebuilds the whole public site on its next visit.
 function refreshPublic() {
+  updateTag(CONTENT_TAG);
   revalidatePath("/", "layout");
   revalidatePath("/sitemap.xml");
 }
@@ -217,6 +218,7 @@ export async function saveSettings(input: SiteSettings): Promise<ActionResult> {
   await sql`
     insert into site_settings (id, data, updated_at) values (1, ${sql.json(parsed.data as never)}, now())
     on conflict (id) do update set data = excluded.data, updated_at = now()`;
+  updateTag(CONTENT_TAG);
   revalidatePath("/", "layout");
   return { ok: true };
 }

@@ -2,8 +2,8 @@ import { Library } from "@/components/Library";
 import { SiteShell } from "@/components/SiteShell";
 import { getSettings, listPublished } from "@/lib/data";
 
-// Static, rebuilt on every admin save (and at most hourly as a fallback).
-export const revalidate = 3600;
+// Rendered per request from cached data (see lib/data.ts), so no page waits on the database.
+export const dynamic = "force-dynamic";
 export const metadata = {
   title: "מדריכים",
   description: "כל המדריכים של ABREKOV: הפרומפטים להעתקה, הקבצים להורדה וכל השלבים. חינם, בלי הרשמה.",

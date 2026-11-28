@@ -7,10 +7,11 @@ import { DEFAULT_SETTINGS } from "@/lib/settings-schema";
 
 // A 404 in the voice of the home page: a prompt that found nothing, and two ways forward.
 export default async function NotFound() {
-  const settings = await getSettings().catch(() => DEFAULT_SETTINGS);
+  // Prerendered at build without the database (it is refreshed from it within the hour).
+  const settings = process.env.NEXT_PHASE === "phase-production-build" ? DEFAULT_SETTINGS : await getSettings().catch(() => DEFAULT_SETTINGS);
   return (
     <div className="site">
-      <SiteHeader />
+      <SiteHeader settings={settings} />
       <main className="lw nf" dir="rtl" lang="he">
         <span className="m">ERROR 404 · PAGE NOT FOUND</span>
         <div className="np" aria-hidden>
