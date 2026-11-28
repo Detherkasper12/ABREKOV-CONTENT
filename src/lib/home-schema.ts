@@ -17,7 +17,7 @@ export type SceneTemplate = keyof typeof SCENE_TEMPLATES;
 // soft + softInk: a second surface and its text, mu: quiet text, dot: the colour that stands for the scene
 // in the chat, the deck, the finale and the guide rows.
 export const PALETTES = {
-  orange: { label: "כתום", bg: "#FD572A", fg: "#0B0B0B", accent: "#0B0B0B", accentInk: "#FD572A", soft: "#EFEDE8", softInk: "#0B0B0B", mu: "rgba(11,11,11,.72)", dot: "#FD572A" },
+  orange: { label: "כתום", bg: "#FD572A", fg: "#0B0B0B", accent: "#0B0B0B", accentInk: "#FD572A", soft: "#EFEDE8", softInk: "#0B0B0B", mu: "rgba(11,11,11,.85)", dot: "#FD572A" },
   maroon: { label: "בורדו וורוד", bg: "#86242C", fg: "#FFD7D8", accent: "#FFD7D8", accentInk: "#86242C", soft: "#160407", softInk: "#FFD7D8", mu: "rgba(255,215,216,.82)", dot: "#FFD7D8" },
   paper: { label: "נייר וסגול", bg: "#EFEDE8", fg: "#0B0B0B", accent: "#695AC6", accentInk: "#EFEDE8", soft: "#0B0B0B", softInk: "#EFEDE8", mu: "#5f5c55", dot: "#695AC6" },
   space: { label: "חלל וליים", bg: "#050505", fg: "#EFEDE8", accent: "#D6FF3A", accentInk: "#0B0B0B", soft: "#141414", softInk: "#EFEDE8", mu: "#A3A099", dot: "#D6FF3A" },

@@ -81,7 +81,7 @@ export const WAITLISTS = {
       { label: "סוכנים", palette: "space" },
     ],
     consent: "אני מסכים ש־ABREKOV יפנה אליי לגבי לימודים. אפשר לבקש להסיר אותי בכל רגע.",
-    button: "לשלוח",
+    button: "לשלוח מה מעניין אותי",
   },
 } satisfies Record<string, WaitlistConfig>;
 

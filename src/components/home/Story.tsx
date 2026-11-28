@@ -1,5 +1,6 @@
 /* eslint-disable @next/next/no-img-element -- frames are small local or Supabase images, moved by the scroll engine */
 import Link from "next/link";
+import { ArrowIcon } from "../Icons";
 import type { CSSProperties } from "react";
 import { splitLines, splitParts, type HomeContent, type Scene } from "@/lib/home-schema";
 import { palette, paletteVars } from "@/lib/palette";
@@ -340,7 +341,7 @@ export function Story({ home }: { home: HomeContent }) {
                 {home.prompt}
               </div>
               <button type="button" className="knob" aria-label={`שלח את הפרומפט: ${home.prompt}`}>
-                <span className="ltr">←</span>
+                <ArrowIcon />
               </button>
             </div>
             <div className="under" data-fade>
@@ -435,7 +436,7 @@ export function Story({ home }: { home: HomeContent }) {
                 <div className="frow">
                   <span className="m">PROMPT 002 · WITH CONTEXT</span>
                   <span className="send" aria-hidden>
-                    <span className="ltr">←</span>
+                    <ArrowIcon />
                   </span>
                 </div>
               </div>

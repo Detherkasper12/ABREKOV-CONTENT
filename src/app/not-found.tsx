@@ -1,5 +1,7 @@
 import Link from "next/link";
+import { ArrowIcon } from "@/components/Icons";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
+import { Typo } from "@/components/Typo";
 import { getSettings } from "@/lib/data";
 import { DEFAULT_SETTINGS } from "@/lib/settings-schema";
 
@@ -14,20 +16,19 @@ export default async function NotFound() {
         <div className="np" aria-hidden>
           <span className="t">תביא לי את העמוד הזה</span>
           <span className="k">
-            <span className="ltr">←</span>
+            <ArrowIcon />
           </span>
         </div>
         <div className="ai">
           <span className="av" aria-hidden>
             <i />
           </span>
-          <p>
-            <span style={{ color: "inherit" }}>
+          <div>
+            <p>
               <b style={{ fontWeight: 500 }}>הדף לא נמצא.</b> חיפשתי בכל מקום. העמוד הזה לא קיים, או שהקישור השתנה.
-            </span>
-            <br />
-            <span>אולי זה עוזר:</span>
-          </p>
+            </p>
+            <p className="mu">אולי זה עוזר:</p>
+          </div>
         </div>
         <div className="ctas">
           <Link className="btn solid" href="/">
@@ -39,6 +40,7 @@ export default async function NotFound() {
         </div>
       </main>
       <SiteFooter settings={settings} />
+      <Typo />
     </div>
   );
 }

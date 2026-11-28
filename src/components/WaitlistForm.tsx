@@ -1,17 +1,19 @@
 "use client";
 
 import { useActionState, useEffect, useId, useRef } from "react";
-import { joinWaitlist, type WaitlistState } from "@/app/(site)/waitlist-actions";
+import { joinWaitlist, type WaitlistField, type WaitlistState } from "@/app/(site)/waitlist-actions";
 import { rowColors } from "@/lib/palette";
 
 // One form for every list: a course waitlist, the /learn interest form, and the short inline
 // version at the end of a guide. Colours come from the block it sits in (.wcard, .lr, .offer, .box).
+// Every field has a visible label above it. An error shows under the field it is about, and what
+// the person typed stays in the form.
 export function WaitlistForm({
   list,
   consent,
   wishLabel,
   topics,
-  button = "תשמור לי מקום",
+  button = "לשמור לי מקום",
   inline = false,
 }: {
   list: string;
@@ -28,6 +30,11 @@ export function WaitlistForm({
   useEffect(() => {
     if (startedAt.current) startedAt.current.value = String(Date.now());
   }, [state]);
+  // After a failed send, move focus to the field that needs fixing.
+  const formRef = useRef<HTMLFormElement>(null);
+  useEffect(() => {
+    if (state && !state.ok && state.field) formRef.current?.querySelector<HTMLElement>(`[name="${state.field}"]`)?.focus();
+  }, [state]);
 
   if (state?.ok) {
     return (
@@ -37,15 +44,27 @@ export function WaitlistForm({
     );
   }
 
+  const v = state?.values;
+  const bad = (f: WaitlistField) => !!state && !state.ok && state.field === f;
+  const errId = `${id}-e`;
+  const fieldProps = (f: WaitlistField) => (bad(f) ? { "aria-invalid": true, "aria-describedby": errId } : {});
+  const fieldError = (f: WaitlistField) =>
+    bad(f) ? (
+      <span className="fe" id={errId} role="alert">
+        {state!.message}
+      </span>
+    ) : null;
+
   const name = (
     <label className="f" htmlFor={`${id}-n`}>
-      {!inline && "איך קוראים לך?"}
-      <input type="text" id={`${id}-n`} name="name" required maxLength={80} autoComplete="name" placeholder={inline ? "שם" : undefined} aria-label={inline ? "שם" : undefined} />
+      <span className="lb">{inline ? "שם" : "איך קוראים לך?"}</span>
+      <input type="text" id={`${id}-n`} name="name" required maxLength={80} autoComplete="name" defaultValue={v?.name} {...fieldProps("name")} />
+      {fieldError("name")}
     </label>
   );
   const contact = (
     <label className="f" htmlFor={`${id}-c`}>
-      {!inline && "וואטסאפ או מייל"}
+      <span className="lb">וואטסאפ או מייל</span>
       <input
         type="text"
         id={`${id}-c`}
@@ -55,15 +74,22 @@ export function WaitlistForm({
         dir="ltr"
         inputMode="email"
         autoComplete="email"
-        placeholder={inline ? "וואטסאפ או מייל" : "050-1234567 / you@email.com"}
-        aria-label={inline ? "וואטסאפ או מייל" : undefined}
+        placeholder="050-1234567 / you@email.com"
+        defaultValue={v?.contact}
         style={{ textAlign: "start" }}
+        {...fieldProps("contact")}
       />
+      {fieldError("contact")}
     </label>
+  );
+  const submit = (
+    <button className="btn" disabled={pending} aria-busy={pending}>
+      {pending ? "שומר…" : button}
+    </button>
   );
 
   return (
-    <form action={action} className={`fm${inline ? " inline" : ""}`} aria-label="הרשמה">
+    <form ref={formRef} action={action} className={`fm${inline ? " inline" : ""}`} aria-label="הרשמה">
       {topics && topics.length > 0 && (
         <>
           <div className="ql" id={`${id}-t`}>
@@ -74,9 +100,9 @@ export function WaitlistForm({
               const c = rowColors(t.palette) as Record<string, string>;
               return (
                 <label className="chip" key={t.label} style={{ "--c": c["--a"], "--ci": c["--ai"] } as React.CSSProperties}>
-                  <input type="checkbox" name="topic" value={t.label} />
+                  <input type="checkbox" name="topic" value={t.label} defaultChecked={v?.topics.includes(t.label)} />
                   <span>
-                    <i />
+                    <i aria-hidden />
                     {t.label}
                   </span>
                 </label>
@@ -89,9 +115,7 @@ export function WaitlistForm({
         <div className="row2">
           {name}
           {contact}
-          <button className="btn" disabled={pending}>
-            {pending ? "שומר…" : button}
-          </button>
+          {submit}
         </div>
       ) : (
         <>
@@ -101,10 +125,11 @@ export function WaitlistForm({
       )}
       {!inline && wishLabel && (
         <label className="f" htmlFor={`${id}-w`}>
-          <span>
+          <span className="lb">
             {wishLabel} <small>(לא חובה)</small>
           </span>
-          <textarea id={`${id}-w`} name="wish" maxLength={400} rows={3} />
+          <textarea id={`${id}-w`} name="wish" maxLength={400} rows={3} defaultValue={v?.wish} {...fieldProps("wish")} />
+          {fieldError("wish")}
         </label>
       )}
       {/* Honeypot: hidden from people, bots fill it. */}
@@ -112,15 +137,12 @@ export function WaitlistForm({
       <input ref={startedAt} type="hidden" name="t" defaultValue="0" />
       <input type="hidden" name="list" value={list} />
       <label className="ck">
-        <input type="checkbox" name="consent" required />
+        <input type="checkbox" name="consent" required {...fieldProps("consent")} />
         <span>{consent}</span>
       </label>
-      {!inline && (
-        <button className="btn" disabled={pending}>
-          {pending ? "שומר…" : button}
-        </button>
-      )}
-      {state && !state.ok && (
+      {fieldError("consent")}
+      {!inline && submit}
+      {state && !state.ok && !state.field && (
         <p className="err" role="alert">
           {state.message}
         </p>

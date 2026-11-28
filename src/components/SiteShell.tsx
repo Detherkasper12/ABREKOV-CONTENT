@@ -1,5 +1,6 @@
 import { getSettings } from "@/lib/data";
 import type { SiteSettings } from "@/lib/settings-schema";
+import { Typo } from "./Typo";
 import { SiteFooter, SiteHeader, type NavKey } from "./SiteChrome";
 
 // Header, main and footer for a public page, inside the .site design system.
@@ -28,6 +29,7 @@ export async function SiteShell({
         {children}
       </main>
       <SiteFooter settings={s} />
+      <Typo />
     </div>
   );
 }

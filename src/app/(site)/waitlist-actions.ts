@@ -6,7 +6,14 @@ import { z } from "zod";
 import { db, ensureSchema } from "@/lib/db";
 import { WAITLISTS, consentFor, isWaitlistList } from "@/lib/waitlist";
 
-export type WaitlistState = { ok: boolean; message: string } | null;
+export type WaitlistField = "name" | "contact" | "wish" | "consent";
+// `field` points the error at the input it is about; `values` refill the form so nothing typed is lost.
+export type WaitlistState = {
+  ok: boolean;
+  message: string;
+  field?: WaitlistField;
+  values?: { name: string; contact: string; wish: string; topics: string[] };
+} | null;
 
 const DONE = "נרשמת! אעדכן אותך ברגע שהקורס נפתח.";
 const DONE_LEARN = "קיבלתי, תודה! ככה אני יודע מה לבנות קודם.";
@@ -27,18 +34,28 @@ export async function joinWaitlist(_prev: WaitlistState, formData: FormData): Pr
   // Bots usually fill every field and submit instantly.
   if (String(formData.get("company") ?? "") !== "") return { ok: true, message: DONE };
   const startedAt = Number(formData.get("t") ?? 0);
-  if (!startedAt || Date.now() - startedAt < 2500) return { ok: false, message: "רגע, נסה שוב בעוד כמה שניות." };
 
+  const values = {
+    name: String(formData.get("name") ?? "").slice(0, 80),
+    contact: String(formData.get("contact") ?? "").slice(0, 120),
+    wish: String(formData.get("wish") ?? "").slice(0, 400),
+    topics: formData.getAll("topic").map(String).slice(0, 12),
+  };
+  const fail = (message: string, field?: WaitlistField): WaitlistState => ({ ok: false, message, field, values });
   const list = String(formData.get("list") ?? "");
-  if (!isWaitlistList(list)) return { ok: false, message: "משהו לא תקין בטופס." };
+  if (!isWaitlistList(list)) return fail("משהו לא תקין בטופס. נסה לרענן את הדף.");
 
   const parsed = schema.safeParse({
     name: String(formData.get("name") ?? ""),
     contact: String(formData.get("contact") ?? ""),
     wish: String(formData.get("wish") ?? ""),
   });
-  if (!parsed.success) return { ok: false, message: parsed.error.issues[0]?.message ?? "משהו לא תקין בטופס." };
-  if (formData.get("consent") !== "on") return { ok: false, message: "צריך לסמן הסכמה כדי להירשם." };
+  if (!parsed.success) {
+    const issue = parsed.error.issues[0];
+    return fail(issue?.message ?? "משהו לא תקין בטופס.", issue?.path[0] as WaitlistField | undefined);
+  }
+  if (formData.get("consent") !== "on") return fail("צריך לסמן את ההסכמה כדי להירשם.", "consent");
+  if (!startedAt || Date.now() - startedAt < 2500) return fail("רגע, נסה שוב בעוד כמה שניות.");
 
   const h = await headers();
   const ip = (h.get("x-forwarded-for") ?? "").split(",")[0].trim() || "unknown";
@@ -48,7 +65,7 @@ export async function joinWaitlist(_prev: WaitlistState, formData: FormData): Pr
 
   const [{ count }] = await sql`
     select count(*)::int as count from waitlist where ip_hash = ${ipHash} and created_at > now() - interval '1 hour'`;
-  if (count >= 5) return { ok: false, message: "יותר מדי ניסיונות. נסה שוב מאוחר יותר." };
+  if (count >= 5) return fail("יותר מדי ניסיונות. נסה שוב בעוד שעה.");
 
   const w = WAITLISTS[list];
   const { name, contact } = parsed.data;

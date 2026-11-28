@@ -232,7 +232,10 @@ export function HomeEditor({ home, onChange }: { home: HomeContent; onChange: (h
             count={scenes.length}
             onChange={(p) => setScene(i, p)}
             onMove={(d) => move(i, d)}
-            onRemove={() => set({ scenes: scenes.filter((_, j) => j !== i) })}
+            onRemove={() => {
+              if (confirm(`למחוק את הסצנה "${s.name || s.title || i + 1}"? הטקסטים והתמונות שלה יימחקו מהדף אחרי השמירה.`))
+                set({ scenes: scenes.filter((_, j) => j !== i) });
+            }}
           />
         ))}
         {scenes.length < 8 && (

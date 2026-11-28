@@ -298,7 +298,11 @@ export function ResourceEditor({
                     <button
                       type="button"
                       className="icon-btn hover:!text-danger"
-                      onClick={() => setBlocks((b) => b.filter((x) => x.id !== block.id))}
+                      onClick={() => {
+                        const hasContent = Object.entries(block).some(([k, v]) => k !== "id" && k !== "type" && typeof v === "string" && v.trim() !== "");
+                        if (hasContent && !confirm("למחוק את הבלוק עם התוכן שלו? אפשר לבטל רק אם לא שומרים את המדריך.")) return;
+                        setBlocks((b) => b.filter((x) => x.id !== block.id));
+                      }}
                       aria-label="מחק בלוק"
                       title="מחק"
                     >

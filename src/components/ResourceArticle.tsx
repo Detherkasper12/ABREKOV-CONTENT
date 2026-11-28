@@ -117,7 +117,7 @@ export function ResourceArticle({ resource: r, settings, related }: { resource: 
             </Link>
           ) : (
             <>
-              <WaitlistForm list={offer.list} consent={consentFor(offer)} button="להירשם" inline />
+              <WaitlistForm list={offer.list} consent={consentFor(offer)} button="להירשם לרשימה" inline />
               <Link className="alt" href={offer.path}>
                 מה ידוע על הקורס ←
               </Link>

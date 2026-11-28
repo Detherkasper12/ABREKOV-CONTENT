@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import type { ResourceSummary } from "@/lib/data";
 import { guidePalette, rowColors } from "@/lib/palette";
@@ -74,9 +75,24 @@ export function Library({ resources, categories, initialCategory }: { resources:
           ))}
         </div>
       ) : (
-        <p className="empty" role="status">
-          אין מדריך כזה עדיין. אולי בסרטון הבא.
-        </p>
+        <div className="empty" role="status">
+          <p>אין מדריך כזה עדיין. אולי בסרטון הבא.</p>
+          <div className="ctas" style={{ justifyContent: "center", marginTop: 24 }}>
+            <button
+              type="button"
+              className="btn"
+              onClick={() => {
+                setQuery("");
+                pick("");
+              }}
+            >
+              להציג את כל המדריכים
+            </button>
+            <Link className="btn" href="/learn">
+              לבקש מדריך על הנושא
+            </Link>
+          </div>
+        </div>
       )}
     </>
   );

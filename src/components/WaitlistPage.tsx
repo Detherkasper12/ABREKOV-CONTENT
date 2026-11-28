@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PlusIcon } from "./Icons";
 import Link from "next/link";
 import { SiteShell } from "@/components/SiteShell";
 import { Stars } from "@/components/Stars";
@@ -47,7 +48,7 @@ export function WaitlistPage({ w }: { w: WaitlistConfig }) {
           <div className="wcard">
             <span className="m">JOIN THE WAITLIST</span>
             <h2 className="F">רשימת המתנה</h2>
-            <WaitlistForm list={w.list} wishLabel={w.wishLabel} consent={consentFor(w)} button={w.button ?? "להירשם"} />
+            <WaitlistForm list={w.list} wishLabel={w.wishLabel} consent={consentFor(w)} button={w.button ?? "להירשם לרשימת ההמתנה"} />
           </div>
         </div>
       </section>
@@ -62,7 +63,7 @@ export function WaitlistPage({ w }: { w: WaitlistConfig }) {
               <summary>
                 {f.q}
                 <span className="pl" aria-hidden>
-                  +
+                  <PlusIcon />
                 </span>
               </summary>
               <p>{f.a}</p>

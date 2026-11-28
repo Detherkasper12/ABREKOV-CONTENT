@@ -47,7 +47,12 @@ export default async function HomePage() {
                 ))}
               </div>
             ) : (
-              <p className="empty">המדריך הראשון בדרך.</p>
+              <div className="empty">
+                <p>המדריך הראשון בדרך.</p>
+                <Link className="btn" href="/learn" style={{ marginTop: 24 }}>
+                  לספר לי מה ללמד קודם
+                </Link>
+              </div>
             )}
             <div className="lib-more">
               <span>כל המדריכים חינם, בלי הרשמה.</span>

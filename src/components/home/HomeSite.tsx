@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { Typo } from "../Typo";
 import { startStory } from "./engine";
 
 // The .site root of the home page. Starts the scroll engine once the story markup is on the page.
@@ -10,6 +11,7 @@ export function HomeSite({ children }: { children: React.ReactNode }) {
   return (
     <div className="site" ref={ref}>
       {children}
+      <Typo />
     </div>
   );
 }

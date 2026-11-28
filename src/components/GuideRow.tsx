@@ -1,5 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
+import { ArrowIcon } from "./Icons";
 import type { ResourceSummary } from "@/lib/data";
 import { guidePalette, rowColors } from "@/lib/palette";
 
@@ -19,7 +20,7 @@ export function GuideRow({ r, index, tag, search }: { r: ResourceSummary; index:
       <span className="ds">{r.description}</span>
       {tag ? <span className="tag">{tag}</span> : <span />}
       <span className="go" aria-hidden>
-        <span className="ltr">←</span>
+        <ArrowIcon />
       </span>
       {r.coverUrl && <img src={r.coverUrl} alt="" loading="lazy" decoding="async" />}
     </Link>
