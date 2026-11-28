@@ -6,7 +6,7 @@ import { joinWaitlist, type WaitlistState } from "@/app/(site)/waitlist-actions"
 const field =
   "w-full rounded-2xl bg-white px-5 text-ink outline-none placeholder:text-muted focus:ring-3 focus:ring-lime";
 
-export function WaitlistForm({ consent }: { consent: string }) {
+export function WaitlistForm({ list, wishLabel, consent }: { list: string; wishLabel: string; consent: string }) {
   const [state, action, pending] = useActionState<WaitlistState, FormData>(joinWaitlist, null);
   // Time the form appeared, for the server-side "submitted too fast" bot check.
   const startedAt = useRef<HTMLInputElement>(null);
@@ -42,13 +42,14 @@ export function WaitlistForm({ consent }: { consent: string }) {
       </label>
       <label className="grid gap-1.5">
         <span className="font-bold">
-          מה היית רוצה לבנות עם סוכן? <span className="font-normal text-mint">(לא חובה)</span>
+          {wishLabel} <span className="font-normal text-mint">(לא חובה)</span>
         </span>
         <textarea name="wish" maxLength={500} rows={3} className={`${field} py-3`} />
       </label>
       {/* Honeypot: hidden from people, bots fill it. */}
       <input type="text" name="company" tabIndex={-1} autoComplete="off" aria-hidden className="hidden" />
       <input ref={startedAt} type="hidden" name="t" defaultValue="0" />
+      <input type="hidden" name="list" value={list} />
       <label className="flex items-start gap-2 text-[14px] text-mint">
         <input type="checkbox" name="consent" required className="mt-1 size-4 accent-lime" />
         <span>{consent}</span>
