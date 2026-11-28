@@ -618,3 +618,8 @@ body:has(.site.paper){background:#EFEDE8}
 .site .fm.inline .row2 .btn{margin-top:8px;min-height:56px}
 }
 @media (max-width:759px){.site .top .hb .tk2{display:none}}
+/* Grid columns never grow past the screen to fit a long unbreakable run. */
+.site .doc{grid-template-columns:minmax(0,1fr)}
+.site :is(.wlg,.lg,.ab,.lr,.lh,.page-h)>*{min-width:0}
+@media (max-width:759px){.site :is(.wlg,.lg,.ab,.lr,.lh,.page-h){grid-template-columns:minmax(0,1fr)}}
+@media (max-width:359px){.site .lr h2{font-size:40px}.site .wlg h1{font-size:38px}.site .lr{padding:24px 16px}}
