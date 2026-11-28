@@ -1,4 +1,5 @@
 import { db, ensureSchema } from "@/lib/db";
+import { WAITLISTS } from "@/lib/waitlist";
 
 export const dynamic = "force-dynamic";
 
@@ -10,7 +11,7 @@ export default async function SubscribersPage() {
   const rows = await sql`select email, status, created_at, confirmed_at from subscribers order by created_at desc limit 1000`;
   const confirmed = rows.filter((r) => r.status === "confirmed").length;
   await ensureSchema();
-  const waitlist = await sql`select name, contact, wish, created_at from waitlist order by created_at desc limit 1000`;
+  const waitlist = await sql`select list, name, contact, wish, created_at from waitlist order by created_at desc limit 2000`;
   return (
     <div className="mx-auto grid max-w-[900px] gap-5 px-4 py-8">
       <div className="flex flex-wrap items-center gap-3">
@@ -34,26 +35,33 @@ export default async function SubscribersPage() {
         ))}
       </div>
 
-      <div className="mt-6 flex flex-wrap items-center gap-3">
-        <h2 className="me-auto text-[22px] font-extrabold">רשימת המתנה: קורס סוכנים</h2>
-        <span className="text-muted">{waitlist.length} נרשמים</span>
-        <a href="/agents" target="_blank" className="btn inline-flex items-center">
-          לדף ההרשמה ↗
-        </a>
-      </div>
-      <div className="card divide-y divide-line">
-        {waitlist.length === 0 && <p className="p-5 text-muted">עוד אין נרשמים לרשימת ההמתנה.</p>}
-        {waitlist.map((r, i) => (
-          <div key={i} className="grid gap-1 p-3 text-[14px]">
+      {Object.values(WAITLISTS).map((w) => {
+        const rows = waitlist.filter((r) => r.list === w.list);
+        return (
+          <section key={w.list} className="mt-6 grid gap-3">
             <div className="flex flex-wrap items-center gap-3">
-              <span className="font-bold">{r.name as string}</span>
-              <span className="ltr me-auto font-mono">{r.contact as string}</span>
-              <span className="text-muted">{fmt.format(r.createdAt as Date)}</span>
+              <h2 className="me-auto text-[22px] font-extrabold">רשימת המתנה: {w.adminLabel}</h2>
+              <span className="text-muted">{rows.length} נרשמים</span>
+              <a href={w.path} target="_blank" className="btn inline-flex items-center">
+                לדף ההרשמה ↗
+              </a>
             </div>
-            {r.wish ? <p className="text-muted">{r.wish as string}</p> : null}
-          </div>
-        ))}
-      </div>
+            <div className="card divide-y divide-line">
+              {rows.length === 0 && <p className="p-5 text-muted">עוד אין נרשמים.</p>}
+              {rows.map((r, i) => (
+                <div key={i} className="grid gap-1 p-3 text-[14px]">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <span className="font-bold">{r.name as string}</span>
+                    <span className="ltr me-auto font-mono">{r.contact as string}</span>
+                    <span className="text-muted">{fmt.format(r.createdAt as Date)}</span>
+                  </div>
+                  {r.wish ? <p className="text-muted">{r.wish as string}</p> : null}
+                </div>
+              ))}
+            </div>
+          </section>
+        );
+      })}
     </div>
   );
 }

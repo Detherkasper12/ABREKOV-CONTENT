@@ -4,7 +4,7 @@ import { createHash } from "node:crypto";
 import { headers } from "next/headers";
 import { z } from "zod";
 import { db, ensureSchema } from "@/lib/db";
-import { WAITLIST_CONSENT } from "@/lib/waitlist";
+import { WAITLIST_CONSENT, isWaitlistList } from "@/lib/waitlist";
 
 export type WaitlistState = { ok: boolean; message: string } | null;
 
@@ -28,6 +28,9 @@ export async function joinWaitlist(_prev: WaitlistState, formData: FormData): Pr
   const startedAt = Number(formData.get("t") ?? 0);
   if (!startedAt || Date.now() - startedAt < 2500) return { ok: false, message: "רגע, נסה שוב בעוד כמה שניות." };
 
+  const list = String(formData.get("list") ?? "");
+  if (!isWaitlistList(list)) return { ok: false, message: "משהו לא תקין בטופס." };
+
   const parsed = schema.safeParse({
     name: String(formData.get("name") ?? ""),
     contact: String(formData.get("contact") ?? ""),
@@ -49,6 +52,6 @@ export async function joinWaitlist(_prev: WaitlistState, formData: FormData): Pr
   const { name, contact, wish } = parsed.data;
   await sql`
     insert into waitlist (list, name, contact, wish, consent_text, ip_hash)
-    values ('agents-course', ${name}, ${contact}, ${wish}, ${WAITLIST_CONSENT}, ${ipHash})`;
+    values (${list}, ${name}, ${contact}, ${wish}, ${WAITLIST_CONSENT}, ${ipHash})`;
   return { ok: true, message: DONE };
 }
