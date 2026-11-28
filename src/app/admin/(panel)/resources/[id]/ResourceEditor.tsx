@@ -7,7 +7,9 @@ import { useCallback, useEffect, useRef, useState, useTransition, type ReactNode
 import { BLOCK_TYPES, emptyBlock, newBlockId, type Block, type BlockType } from "@/lib/blocks";
 import type { ResourceStatus } from "@/lib/data";
 import { markdownToResource } from "@/lib/markdown";
+import { PALETTES } from "@/lib/home-schema";
 import { publishProblems, type ResourceInput } from "@/lib/resource-schema";
+import { OFFER_CHOICES } from "@/lib/waitlist";
 import { deleteResource, duplicateResource, saveResource, setStatus } from "../../../actions";
 import { BlockFields } from "./BlockEditors";
 import { UploadButton } from "./Upload";
@@ -296,7 +298,11 @@ export function ResourceEditor({
                     <button
                       type="button"
                       className="icon-btn hover:!text-danger"
-                      onClick={() => setBlocks((b) => b.filter((x) => x.id !== block.id))}
+                      onClick={() => {
+                        const hasContent = Object.entries(block).some(([k, v]) => k !== "id" && k !== "type" && typeof v === "string" && v.trim() !== "");
+                        if (hasContent && !confirm("למחוק את הבלוק עם התוכן שלו? אפשר לבטל רק אם לא שומרים את המדריך.")) return;
+                        setBlocks((b) => b.filter((x) => x.id !== block.id));
+                      }}
                       aria-label="מחק בלוק"
                       title="מחק"
                     >
@@ -351,7 +357,7 @@ export function ResourceEditor({
             </Labeled>
             <label className="flex items-center gap-2 text-[15px] font-bold">
               <input type="checkbox" checked={r.featured} onChange={(e) => update({ featured: e.target.checked })} className="size-4 accent-[#12332A]" />
-              מומלץ בדף הבית
+              מומלץ (מופיע ראשון ברשימה)
             </label>
             <label className="grid gap-0.5 text-[15px] font-bold">
               <span className="flex items-center gap-2">
@@ -359,9 +365,31 @@ export function ResourceEditor({
                 רק בקישור (לא מופיע בספרייה)
               </span>
               <span className="ps-6 text-[13px] font-normal text-muted">
-                הדף נפתח רק למי שיש לו את הקישור: לא בדף הבית, לא בחיפוש, לא ב&quot;עוד משאבים&quot; ולא ב־Google. בדף עצמו אין קישורים לשאר המשאבים.
+                הדף נפתח רק למי שיש לו את הקישור: לא בדף הבית, לא ברשימת המדריכים, לא ב&quot;עוד מדריכים&quot; ולא ב־Google.
               </span>
             </label>
+          </Section>
+
+          <Section title="צבע והצעה בסוף המדריך">
+            <Labeled label="צבע המדריך" hint="בשורה ברשימת המדריכים. אוטומטי = לפי הקטגוריה">
+              <select value={r.accent} onChange={(e) => update({ accent: e.target.value })} className="field">
+                <option value="">אוטומטי</option>
+                {(Object.keys(PALETTES) as (keyof typeof PALETTES)[]).map((k) => (
+                  <option key={k} value={k}>
+                    {PALETTES[k].label}
+                  </option>
+                ))}
+              </select>
+            </Labeled>
+            <Labeled label="ההצעה בסוף המדריך" hint="הצעה אחת אחרי התוכן. אוטומטי = הקורס שהמדריך הזה הוא המדריך החינמי שלו, אחרת טופס ״ללמוד עוד״">
+              <select value={r.offer} onChange={(e) => update({ offer: e.target.value })} className="field">
+                {OFFER_CHOICES.map((o) => (
+                  <option key={o.value} value={o.value}>
+                    {o.label}
+                  </option>
+                ))}
+              </select>
+            </Labeled>
           </Section>
 
           <Section title="Instagram">

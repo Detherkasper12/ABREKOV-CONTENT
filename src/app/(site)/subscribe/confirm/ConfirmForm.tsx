@@ -10,7 +10,7 @@ export function ConfirmForm({ token }: { token: string }) {
     return (
       <div className="grid gap-3">
         <p className="text-[19px] font-bold">נרשמת. מהיום תקבל ממני כלים ומדריכים חדשים.</p>
-        <Link href="/" className="font-bold text-forest underline">
+        <Link href="/" className="font-bold underline">
           חזרה למשאבים
         </Link>
       </div>
@@ -21,7 +21,7 @@ export function ConfirmForm({ token }: { token: string }) {
       <input type="hidden" name="token" value={token} />
       <p className="text-[18px]">לחץ על הכפתור כדי לאשר שאתה רוצה לקבל מיילים מ־ABREKOV.</p>
       {result === false && <p className="font-bold text-danger">הקישור לא תקין או שפג תוקפו. אפשר להירשם שוב מדף הבית.</p>}
-      <button disabled={pending || !token} className="rounded-full bg-forest px-6 py-3 font-extrabold text-lime disabled:opacity-60">
+      <button disabled={pending || !token} className="btn solid">
         {pending ? "מאשר…" : "אשר הרשמה"}
       </button>
     </form>

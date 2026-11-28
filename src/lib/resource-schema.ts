@@ -23,6 +23,8 @@ export const resourceInputSchema = z.object({
     .refine((v) => v === "" || /^https:\/\//i.test(v), "קישור התשלום חייב להתחיל ב־https://"),
   featured: z.boolean(),
   unlisted: z.boolean(),
+  accent: z.string().trim().max(20).default(""),
+  offer: z.string().trim().max(40).default(""),
   seoTitle: z.string().trim().max(160),
   seoDescription: z.string().trim().max(300),
   fileUrl: safeUrl,

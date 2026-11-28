@@ -2,6 +2,7 @@ import "server-only";
 import { db, ensureSchema } from "./db";
 import { blocksSchema, type Block } from "./blocks";
 import { DEFAULT_SETTINGS, settingsSchema, type SiteSettings } from "./settings-schema";
+import { DEFAULT_HOME } from "./home-schema";
 
 export type ResourceStatus = "draft" | "published" | "archived";
 
@@ -23,6 +24,10 @@ export type Resource = {
   featured: boolean;
   // Link-only: reachable by its direct URL, left out of the library, search, related and sitemap.
   unlisted: boolean;
+  // Palette key for the guide's colour in the library rows and on its page ("" = from the category).
+  accent: string;
+  // Offer shown once at the end of the guide: "" = matched automatically, "none", or a waitlist list.
+  offer: string;
   seoTitle: string;
   seoDescription: string;
   fileUrl: string;
@@ -44,6 +49,8 @@ function toResource(row: Row): Resource {
     ...(row as unknown as Resource),
     priceIls: row.priceIls == null ? null : Number(row.priceIls),
     unlisted: Boolean(row.unlisted),
+    accent: (row.accent as string) ?? "",
+    offer: (row.offer as string) ?? "",
     // The file columns may not exist yet on a database that predates migration 0002.
     fileUrl: (row.fileUrl as string) ?? "",
     fileName: (row.fileName as string) ?? "",
@@ -53,12 +60,18 @@ function toResource(row: Row): Resource {
 }
 
 function toSummary(row: Row): ResourceSummary {
-  return { ...(row as unknown as ResourceSummary), priceIls: row.priceIls == null ? null : Number(row.priceIls), unlisted: Boolean(row.unlisted) };
+  return {
+    ...(row as unknown as ResourceSummary),
+    priceIls: row.priceIls == null ? null : Number(row.priceIls),
+    unlisted: Boolean(row.unlisted),
+    accent: (row.accent as string) ?? "",
+    offer: (row.offer as string) ?? "",
+  };
 }
 
 const SUMMARY_COLUMNS = [
   "id", "slug", "title", "description", "label", "keyword", "cover_url", "cover_alt", "category", "tags",
-  "kind", "price_ils", "checkout_url", "status", "featured", "unlisted", "created_at", "updated_at", "published_at",
+  "kind", "price_ils", "checkout_url", "status", "featured", "unlisted", "accent", "offer", "created_at", "updated_at", "published_at",
 ];
 
 // Public queries only ever return published rows. A link-only (unlisted) one is returned
@@ -122,6 +135,13 @@ export async function getSettings(): Promise<SiteSettings> {
   // The settings form saved the old Telegram defaults into the database. Values that still equal
   // those defaults are replaced by the current ones; anything the owner edited is kept as is.
   for (const [key, old] of Object.entries(LEGACY_DEFAULTS)) if (stored[key] === old) delete stored[key];
-  const parsed = settingsSchema.safeParse({ ...DEFAULT_SETTINGS, ...stored });
+  // Home content merges key by key, so a field added later gets its default instead of an empty value.
+  const home = stored.home && typeof stored.home === "object" ? { ...DEFAULT_HOME, ...(stored.home as object) } : DEFAULT_HOME;
+  const parsed = settingsSchema.safeParse({ ...DEFAULT_SETTINGS, ...stored, home });
+  if (!parsed.success && stored.home) {
+    // A broken home block must never take the rest of the settings down with it.
+    const rest = settingsSchema.safeParse({ ...DEFAULT_SETTINGS, ...stored, home: DEFAULT_HOME });
+    if (rest.success) return rest.data;
+  }
   return parsed.success ? parsed.data : DEFAULT_SETTINGS;
 }

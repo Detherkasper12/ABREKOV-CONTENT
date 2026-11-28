@@ -2,201 +2,156 @@
 import Link from "next/link";
 import { headingAnchor, type BlockOf } from "@/lib/blocks";
 import type { Resource, ResourceSummary } from "@/lib/data";
+import { paletteVars } from "@/lib/palette";
 import type { SiteSettings } from "@/lib/settings-schema";
-import { ContactCta } from "./ContactCta";
-import { MembershipCta } from "./MembershipCta";
-import { TelegramBanner } from "./TelegramBanner";
+import { consentFor, offerFor } from "@/lib/waitlist";
 import { BlockList } from "./blocks/BlockRenderer";
-import { formatPrice, ResourceCard } from "./ResourceCard";
+import { GuideRow } from "./GuideRow";
+import { formatPrice } from "./ResourceCard";
+import { WaitlistForm } from "./WaitlistForm";
 
 const dateFmt = new Intl.DateTimeFormat("he-IL", { day: "numeric", month: "long", year: "numeric" });
 
-export function ResourceArticle({
-  resource: r,
-  settings,
-  related,
-}: {
-  resource: Resource;
-  settings: SiteSettings;
-  related: ResourceSummary[];
-}) {
+// The reading page: content first and no motion. At the end, one offer that matches the topic,
+// then a quiet way to the rest of the guides.
+export function ResourceArticle({ resource: r, settings, related }: { resource: Resource; settings: SiteSettings; related: ResourceSummary[] }) {
   const categories = new Map(settings.categories.map((c) => [c.slug, c.label]));
   const headings = r.blocks.filter((b): b is BlockOf<"heading"> => b.type === "heading" && b.level === 2 && !!b.text);
   const canBuy = r.kind === "paid" && /^https:\/\//.test(r.checkoutUrl) && (r.priceIls ?? 0) > 0;
+  const offer = r.kind === "free" ? offerFor(r.slug, r.offer) : null;
+  const cat = r.category ? categories.get(r.category) : undefined;
+  const eyebrow = ["GUIDE", r.label, r.kind === "paid" ? "DIGITAL PRODUCT" : "FREE"].filter(Boolean).join(" · ");
 
   return (
-    <article className="mx-auto max-w-[1180px] px-4 pt-8">
-      <div className="lg:grid lg:grid-cols-[minmax(0,760px)_1fr] lg:gap-x-10">
-      <div className="min-w-0">
-      {!r.unlisted && (
-        <nav className="mb-6 flex flex-wrap items-center gap-2 text-[14px] text-muted" aria-label="פירורי לחם">
-          <Link href="/#library" className="font-bold hover:text-ink">
-            משאבים
-          </Link>
-          {r.category && categories.get(r.category) && (
+    <>
+      <article className="gd">
+        {!r.unlisted && (
+          <nav className="crumbs" aria-label="פירורי לחם">
+            <Link href="/resources">מדריכים</Link>
+            {cat && (
+              <>
+                <span aria-hidden>/</span>
+                <Link href={`/resources?category=${r.category}`}>{cat}</Link>
+              </>
+            )}
+          </nav>
+        )}
+        <span className="m">{eyebrow}</span>
+        <h1>{r.title}</h1>
+        {r.description && <p className="lead">{r.description}</p>}
+        <p className="meta">
+          עודכן ב־{dateFmt.format(r.updatedAt)}
+          {r.tags.length > 0 && " · "}
+          {r.tags.map((t) => (
+            <bdi key={t} style={{ marginInlineEnd: 8 }}>
+              #{t}
+            </bdi>
+          ))}
+        </p>
+
+        {r.kind === "free" && (
+          <div className="dl">
+            {r.fileUrl && (
+              <a href={r.fileUrl} download={r.fileName || true} data-track="download_click" data-track-slug={r.slug} data-track-type="file" className="btn solid">
+                <span aria-hidden>↓</span> הורדת הקובץ
+                {r.fileName && <bdi className="ltr m" style={{ color: "inherit" }}>{r.fileName.split(".").pop()}</bdi>}
+              </a>
+            )}
+            <a
+              href={`/resources/${r.slug}/download`}
+              download
+              data-track="download_click"
+              data-track-slug={r.slug}
+              data-track-type="markdown"
+              className={r.fileUrl ? "alt" : "btn"}
+            >
+              {r.fileUrl ? "או את כל הדף כקובץ Markdown" : "↓ הורדת המדריך כקובץ"}
+            </a>
+          </div>
+        )}
+
+        {r.coverUrl && <img className="cover" src={r.coverUrl} alt={r.coverAlt} />}
+
+        {r.kind === "paid" && (
+          <div className="buy">
+            <div>
+              <span className="pr">{formatPrice(r.priceIls)}</span>
+              <small>התשלום והמשלוח של הקבצים מתבצעים בעמוד תשלום מאובטח.</small>
+            </div>
+            {canBuy ? (
+              <a href={r.checkoutUrl} target="_blank" rel="noopener noreferrer" className="btn solid">
+                לרכישה
+              </a>
+            ) : (
+              <span className="btn" aria-disabled>
+                הרכישה תיפתח בקרוב
+              </span>
+            )}
+          </div>
+        )}
+
+        {headings.length > 2 && (
+          <nav className="toc" aria-label="תוכן העניינים">
+            {headings.map((h, i) => (
+              <a key={h.id} href={`#${headingAnchor(h)}`}>
+                {String(i + 1).padStart(2, "0")} · {h.text}
+              </a>
+            ))}
+          </nav>
+        )}
+
+        <div className="body">
+          {r.kind === "paid" && r.blocks.length > 0 && <p className="m pv">PREVIEW</p>}
+          <BlockList blocks={r.blocks} />
+        </div>
+      </article>
+
+      {offer && (
+        <aside className="offer" style={paletteVars(offer.palette)} aria-labelledby="offer-h">
+          <span className="m">{offer.offer.eyebrow}</span>
+          <h3 id="offer-h">{offer.offer.title}</h3>
+          <p>{offer.offer.text}</p>
+          {offer.list === "learn" ? (
+            <Link className="btn" href={offer.path} style={{ justifySelf: "start", background: "var(--accent)", color: "var(--accentInk)", borderColor: "var(--accent)" }}>
+              {offer.offer.button} ←
+            </Link>
+          ) : (
             <>
-              <span aria-hidden>/</span>
-              <Link href={`/?category=${r.category}#library`} className="hover:text-ink">
-                {categories.get(r.category)}
+              <WaitlistForm list={offer.list} consent={consentFor(offer)} button="להירשם לרשימה" inline />
+              <Link className="alt" href={offer.path}>
+                מה ידוע על הקורס ←
               </Link>
             </>
           )}
-        </nav>
+        </aside>
       )}
 
-      <header className={`grid max-w-[760px] gap-4 ${r.unlisted ? "pt-2" : ""}`}>
-        <div className="flex flex-wrap items-center gap-3">
-          {r.label && <span className="ltr font-mono text-[12.5px] tracking-[0.06em] text-muted">{r.label}</span>}
-          <span
-            className={`rounded-full px-2.5 py-0.5 text-[13px] font-extrabold ${r.kind === "paid" ? "bg-ink text-lime" : "bg-lime text-ink"}`}
-          >
-            {r.kind === "paid" ? "מוצר דיגיטלי" : "חינם"}
-          </span>
-        </div>
-        <h1
-          className={`font-display leading-[0.88] text-balance text-forest ${
-            // Karantina is condensed, but long Hebrew titles still need a smaller step on phones.
-            r.title.length > 48 ? "text-[clamp(40px,8vw,72px)]" : "text-[clamp(52px,12vw,92px)]"
-          }`}
-        >
-          {r.title}
-        </h1>
-        {r.description && <p className="text-[19px] leading-relaxed font-semibold text-ink/85">{r.description}</p>}
-        <p className="text-[14px] text-muted">
-          עודכן ב־{dateFmt.format(r.updatedAt)}
-          {r.tags.length > 0 && (
-            <>
-              {" · "}
-              {r.tags.map((t) => (
-                <bdi key={t} className="me-2">
-                  #{t}
-                </bdi>
-              ))}
-            </>
-          )}
-        </p>
-      </header>
-
-      {r.kind === "free" && (
-        <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3">
-          {r.fileUrl ? (
-            <a href={r.fileUrl} download={r.fileName || true} data-track="download_click" data-track-slug={r.slug} data-track-type="file" className="btn-primary min-h-12 px-6">
-              <span aria-hidden>↓</span>
-              הורדת הקובץ
-              {r.fileName && <bdi className="ltr font-mono text-[13px] font-semibold opacity-80">{r.fileName.split(".").pop()?.toUpperCase()}</bdi>}
-            </a>
-          ) : null}
-          <a
-            href={`/resources/${r.slug}/download`}
-            download
-            data-track="download_click"
-            data-track-slug={r.slug}
-            data-track-type="markdown"
-            className={r.fileUrl ? "text-[15px] font-bold text-forest underline-offset-4 hover:underline" : "btn-primary min-h-12 px-6"}
-          >
-            {!r.fileUrl && <span aria-hidden>↓</span>}
-            {r.fileUrl ? "או את כל הדף כקובץ Markdown" : "הורדת המשאב כקובץ"}
+      <div className="gd-more">
+        <span>זה רק מדריך אחד. באתר יש עוד, הכל חינם.</span>
+        <Link href="/resources">לכל המדריכים ←</Link>
+      </div>
+      {settings.telegramUrl && (
+        <div className="gd-more" style={{ borderTop: 0, paddingTop: 12 }}>
+          <span>רוצה לקבל את המדריך הבא ראשון?</span>
+          <a href={settings.telegramUrl} target="_blank" rel="noopener noreferrer" data-track="community_click">
+            {settings.home.communityTitle || "קהילה בוואטסאפ"} ←
           </a>
         </div>
       )}
 
-      {r.coverUrl && (
-        <img
-          src={r.coverUrl}
-          alt={r.coverAlt}
-          className="mt-8 aspect-[16/9] w-full max-w-[760px] rounded-[18px] border border-line bg-forest object-cover"
-        />
-      )}
-
-      {r.kind === "paid" && (
-        <div className="card mt-8 flex max-w-[760px] flex-wrap items-center justify-between gap-4 p-5">
-          <div className="grid gap-1">
-            <span className="font-mono text-[26px] font-semibold">{formatPrice(r.priceIls)}</span>
-            <span className="text-[14px] text-muted">התשלום והמשלוח של הקבצים מתבצעים בעמוד תשלום מאובטח.</span>
-          </div>
-          {canBuy ? (
-            <a
-              href={r.checkoutUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="rounded-full bg-forest px-6 py-3 font-extrabold text-lime hover:bg-forest-2"
-            >
-              לרכישה
-            </a>
-          ) : (
-            <span className="rounded-full border border-line px-5 py-2.5 font-bold text-muted">הרכישה תיפתח בקרוב</span>
-          )}
-        </div>
-      )}
-
-      <div className="mt-10 grid gap-10">
-        <div className="min-w-0">
-          {r.kind === "paid" && r.blocks.length > 0 && <p className="eyebrow mb-4">תצוגה מקדימה</p>}
-          <BlockList blocks={r.blocks} />
-        </div>
-        {headings.length > 2 && (
-          <aside className="order-first lg:hidden">
-            <nav
-              className="card p-4 lg:sticky lg:top-20 lg:border-0 lg:bg-transparent lg:p-0"
-              aria-label="תוכן העניינים"
-            >
-              <p className="eyebrow mb-2">בדף הזה</p>
-              <ol className="grid gap-1.5 text-[15px]">
-                {headings.map((h) => (
-                  <li key={h.id}>
-                    <a href={`#${headingAnchor(h)}`} className="text-muted hover:text-ink">
-                      {h.text}
-                    </a>
-                  </li>
-                ))}
-              </ol>
-            </nav>
-          </aside>
-        )}
-      </div>
-
-      <div className="mt-16 grid max-w-[760px] gap-5">
-        <TelegramBanner settings={settings} place="resource" />
-        {r.kind === "free" && <MembershipCta settings={settings} slug={r.slug} />}
-        <ContactCta
-          settings={settings}
-          title={settings.resourceCtaTitle}
-          text={settings.resourceCtaText}
-          button={settings.resourceCtaButton}
-          place="resource"
-        />
-      </div>
-
-      </div>
-      <aside className="hidden lg:flex lg:flex-col lg:gap-8">
-        <TelegramBanner settings={settings} place="resource" compact />
-        {headings.length > 2 && (
-          <nav className="sticky top-20" aria-label="תוכן העניינים">
-            <p className="eyebrow mb-2">בדף הזה</p>
-            <ol className="grid gap-1.5 text-[15px]">
-              {headings.map((h) => (
-                <li key={h.id}>
-                  <a href={`#${headingAnchor(h)}`} className="text-muted hover:text-ink">
-                    {h.text}
-                  </a>
-                </li>
-              ))}
-            </ol>
-          </nav>
-        )}
-      </aside>
-      </div>
-
       {!r.unlisted && related.length > 0 && (
-        <section className="mt-16 grid gap-5 border-t border-line pt-10">
-          <h2 className="text-[24px] font-extrabold">עוד משאבים</h2>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {related.map((x) => (
-              <ResourceCard key={x.id} r={x} categoryLabel={categories.get(x.category)} />
+        <section className="related" aria-labelledby="rel-h">
+          <h2 className="F" id="rel-h">
+            עוד מדריכים
+          </h2>
+          <div className="rows">
+            {related.map((x, i) => (
+              <GuideRow key={x.id} r={x} index={i} />
             ))}
           </div>
         </section>
       )}
-    </article>
+    </>
   );
 }
+
