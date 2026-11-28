@@ -20,9 +20,13 @@ export default async function PreviewPage(props: PageProps<"/admin/resources/[id
           חזרה לעריכה
         </Link>
       </div>
-      <SiteHeader settings={settings} isolated={r.unlisted} />
-      <ResourceArticle resource={r} settings={settings} related={related} />
-      <SiteFooter settings={settings} />
+      <div className="site">
+        <SiteHeader quiet={r.unlisted} current="library" />
+        <main dir="rtl" lang="he">
+          <ResourceArticle resource={r} settings={settings} related={related} />
+        </main>
+        <SiteFooter settings={settings} />
+      </div>
     </div>
   );
 }

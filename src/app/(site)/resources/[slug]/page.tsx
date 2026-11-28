@@ -30,7 +30,7 @@ export default async function ResourcePage(props: PageProps<"/resources/[slug]">
   if (!resource) notFound();
   const [settings, related] = await Promise.all([getSettings(), resource.unlisted ? [] : listRelated(resource)]);
   return (
-    <SiteShell settings={settings} isolated={resource.unlisted}>
+    <SiteShell settings={settings} quiet={resource.unlisted} current="library">
       <ResourceArticle resource={resource} settings={settings} related={related} />
     </SiteShell>
   );

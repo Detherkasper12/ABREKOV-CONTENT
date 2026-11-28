@@ -1,54 +1,75 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SiteShell } from "@/components/SiteShell";
+import { Stars } from "@/components/Stars";
 import { WaitlistForm } from "@/components/WaitlistForm";
-import { WAITLIST_CONSENT, type WaitlistConfig } from "@/lib/waitlist";
+import { paletteVars } from "@/lib/palette";
+import { consentFor, type WaitlistConfig } from "@/lib/waitlist";
 
-// Reached from an Instagram DM funnel only, so it is kept out of search and the library chrome.
+// Course pages are reached from Instagram DM funnels, so they stay out of search.
 export function waitlistMetadata(w: WaitlistConfig): Metadata {
   return {
     title: w.title,
     description: w.description,
-    robots: { index: false, follow: false },
+    robots: w.isPublic ? undefined : { index: false, follow: false },
     alternates: { canonical: w.path },
     openGraph: { title: w.title, description: w.description },
   };
 }
 
-function Point({ children }: { children: React.ReactNode }) {
-  return (
-    <li className="flex gap-2">
-      <span aria-hidden className="mt-2 size-2 shrink-0 rounded-full bg-forest" />
-      {children}
-    </li>
-  );
-}
+// Honest about the state of the course: no date, no price yet, the list is free and can be left.
+const FAQ = [
+  { q: "מתי הקורס יוצא?", a: "עוד אין תאריך. מי שברשימת ההמתנה יקבל הודעה ראשון, ברגע שיהיה." },
+  { q: "כמה הוא יעלה?", a: "המחיר עוד לא נקבע. ההרשמה לרשימה חינם ולא מחייבת לכלום." },
+  { q: "מה קורה עם הפרטים שלי?", a: "הם נשמרים רק כדי לעדכן אותך על הקורס. אפשר לבקש להימחק מהרשימה מתי שרוצים." },
+];
 
 export function WaitlistPage({ w }: { w: WaitlistConfig }) {
   return (
-    <SiteShell isolated>
-      <div className="mx-auto grid max-w-[720px] gap-8 px-4 py-12 sm:py-16">
-        <header className="grid gap-4">
-          <p className="flex items-center gap-2">
-            <span className="eyebrow-mono">COURSE</span>
-            <span className="rounded-full bg-lime px-3 py-0.5 text-[13px] font-extrabold text-ink">רשימת המתנה</span>
-          </p>
-          <h1 className="font-display text-[56px] leading-[0.9] text-balance text-forest sm:text-[84px]">{w.title}</h1>
-          <p className="text-[19px] text-pretty">{w.lead}</p>
-        </header>
-        <ul className="grid gap-2 text-[17px]">
-          <Point>הקורס עוד לא יצא. נרשמים לרשימה מקבלים הודעה ראשונים כשההרשמה נפתחת.</Point>
-          <Point>תכתוב מה היית רוצה ללמוד, ואבנה את הקורס סביב מה שבאמת חשוב לך.</Point>
-          <Point>בלי ספאם. רק עדכון על הקורס.</Point>
-        </ul>
-        <WaitlistForm list={w.list} wishLabel={w.wishLabel} consent={WAITLIST_CONSENT} />
-        <p className="text-muted">
-          עוד לא קראת את המדריך החינמי?{" "}
-          <Link href={w.guide.href} className="font-bold text-forest underline underline-offset-4">
-            {w.guide.label}
-          </Link>
-        </p>
-      </div>
+    <SiteShell current={w.list === "agents-course" ? "agents" : ""}>
+      <section className="wl-hero" style={paletteVars(w.palette)}>
+        {w.palette === "space" && <Stars />}
+        <div className="lw wlg">
+          <div>
+            <span className="m">COURSE · WAITLIST</span>
+            <h1 className="F">{w.title}</h1>
+            <p className="sub">{w.lead}</p>
+            <div className="stat">
+              <i aria-hidden />
+              <span className="m">IN PROGRESS · NO RELEASE DATE YET</span>
+            </div>
+            {w.guide && (
+              <p className="wl-guide">
+                עוד לא קראת את המדריך החינמי? <Link href={w.guide.href}>{w.guide.label}</Link>
+              </p>
+            )}
+          </div>
+          <div className="wcard">
+            <span className="m">JOIN THE WAITLIST</span>
+            <h2 className="F">רשימת המתנה</h2>
+            <WaitlistForm list={w.list} wishLabel={w.wishLabel} consent={consentFor(w)} button={w.button ?? "להירשם"} />
+          </div>
+        </div>
+      </section>
+      <section className="lw faq" aria-labelledby="faq-h">
+        <span className="m">QUESTIONS</span>
+        <h2 className="F" id="faq-h">
+          מה כבר ידוע.
+        </h2>
+        <div className="qa">
+          {FAQ.map((f, i) => (
+            <details key={f.q} open={i === 0}>
+              <summary>
+                {f.q}
+                <span className="pl" aria-hidden>
+                  +
+                </span>
+              </summary>
+              <p>{f.a}</p>
+            </details>
+          ))}
+        </div>
+      </section>
     </SiteShell>
   );
 }

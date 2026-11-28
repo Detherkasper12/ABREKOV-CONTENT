@@ -10,8 +10,8 @@ export default async function ConfirmPage(props: PageProps<"/subscribe/confirm">
   const { token } = await props.searchParams;
   return (
     <SiteShell>
-    <div className="mx-auto grid max-w-[560px] gap-4 px-4 py-20">
-      <h1 className="font-display text-[64px] leading-[0.9] text-forest">רק עוד לחיצה</h1>
+    <div className="lw" style={{ paddingBlock: 90, display: "grid", gap: 24, justifyItems: "start" }}>
+      <h1 className="F" style={{ fontSize: "clamp(48px,8vw,96px)", lineHeight: 0.9 }}>רק עוד לחיצה</h1>
       <ConfirmForm token={typeof token === "string" ? token : ""} />
     </div>
     </SiteShell>

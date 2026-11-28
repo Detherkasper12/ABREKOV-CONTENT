@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { safeUrl } from "./blocks";
+import { DEFAULT_HOME, homeSchema } from "./home-schema";
 
 const text = (max: number) => z.string().trim().max(max).default("");
 
@@ -42,6 +43,8 @@ export const settingsSchema = z.object({
     .array(z.object({ label: z.string().trim().min(1).max(40), url: safeUrl }))
     .max(10)
     .default([]),
+  // The home page story and the sections under it, edited in /admin/settings.
+  home: homeSchema.default(DEFAULT_HOME),
 });
 
 export type SiteSettings = z.infer<typeof settingsSchema>;
@@ -82,4 +85,5 @@ export const DEFAULT_SETTINGS: SiteSettings = {
     { slug: "templates", label: "תבניות" },
   ],
   socials: [],
+  home: DEFAULT_HOME,
 };

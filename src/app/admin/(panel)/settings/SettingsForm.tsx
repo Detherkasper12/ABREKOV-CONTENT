@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition, type ReactNode } from "react";
 import type { SiteSettings } from "@/lib/settings-schema";
 import { saveSettings } from "../../actions";
+import { HomeEditor } from "./HomeEditor";
 
 function Group({ title, children }: { title: string; children: ReactNode }) {
   return (
@@ -24,7 +25,7 @@ function F({ label, hint, children }: { label: string; hint?: string; children: 
   );
 }
 
-export function SettingsForm({ initial, emailReady }: { initial: SiteSettings; emailReady: boolean }) {
+export function SettingsForm({ initial }: { initial: SiteSettings }) {
   const router = useRouter();
   const [s, setS] = useState(initial);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
@@ -64,37 +65,20 @@ export function SettingsForm({ initial, emailReady }: { initial: SiteSettings; e
         </button>
       </div>
 
-      <Group title="דף הבית">
-        <F label="כותרת ראשית">{text("heroTitle")}</F>
-        <F label="פתיח">{text("heroText", { area: true })}</F>
-      </Group>
+      <HomeEditor home={s.home} onChange={(home) => set({ home })} />
 
       <Group title="עליי ויצירת קשר">
-        <F label="שם">{text("aboutName", { ltr: true })}</F>
-        <F label="טקסט קצר עליי">{text("aboutText", { area: true })}</F>
+        <F label="שם" hint="טקסט חלופי לתמונה ושם בקרדיטים">{text("aboutName", { ltr: true })}</F>
         <F label="Instagram" hint="בלי @">{text("instagramHandle", { ltr: true })}</F>
-        <F label="קישור לפורטפוליו" hint="ריק = לא מוצג">{text("portfolioUrl", { ltr: true, placeholder: "https://" })}</F>
-        <F label="אימייל ליצירת קשר" hint="ריק = כפתור שיתוף פעולה מוביל ל־Instagram">
+        <F label="קישור לפורטפוליו" hint="ריק = לא מוצג. מופיע בתחתית האתר">{text("portfolioUrl", { ltr: true, placeholder: "https://" })}</F>
+        <F label="אימייל ליצירת קשר" hint="ריק = לא מוצג. מופיע בתחתית האתר">
           {text("contactEmail", { ltr: true, placeholder: "you@domain.com" })}
         </F>
-        <F label="כותרת שיתוף פעולה">{text("collabTitle")}</F>
-        <F label="טקסט שיתוף פעולה">{text("collabText", { area: true })}</F>
-        <F label="טקסט הכפתור">{text("collabButton")}</F>
-        <F label="כותרת בסוף דף משאב" hint="ריק = הבלוק לא מוצג">{text("resourceCtaTitle")}</F>
-        <F label="טקסט בסוף דף משאב">{text("resourceCtaText", { area: true })}</F>
-        <F label="כפתור בסוף דף משאב">{text("resourceCtaButton")}</F>
-        <F label="כותרת מנוי (מתחת למדריכים חינמיים)" hint="ריק = הבלוק לא מוצג. הכפתור פותח צ'אט איתך באינסטגרם">{text("memberTitle")}</F>
-        <F label="טקסט מנוי">{text("memberText", { area: true })}</F>
-        <F label="כפתור מנוי">{text("memberButton")}</F>
       </Group>
 
-      <Group title="ערוץ טלגרם">
-        <F label="קישור לקבוצת וואטסאפ" hint="ריק = הבאנר לא מוצג בשום מקום. למשל https://chat.whatsapp.com/…">{text("telegramUrl", { ltr: true, placeholder: "https://chat.whatsapp.com/" })}</F>
-        <F label="כותרת הבאנר">{text("telegramTitle")}</F>
-        <F label="טקסט הבאנר">{text("telegramText", { area: true })}</F>
-        <F label="מה מקבלים" hint="שורה לכל נקודה, עד 4">{text("telegramPerks", { area: true })}</F>
-        <F label="טקסט הכפתור">{text("telegramButton")}</F>
-        <F label="שורה מרגיעה מתחת לכפתור">{text("telegramNote")}</F>
+      <Group title="קהילה בוואטסאפ">
+        <F label="קישור לקבוצת וואטסאפ" hint="ריק = הקהילה לא מוצגת בשום מקום. למשל https://chat.whatsapp.com/…">{text("telegramUrl", { ltr: true, placeholder: "https://chat.whatsapp.com/" })}</F>
+        <p className="text-[13px] text-muted">הכותרת והטקסט של הקהילה נערכים למעלה, ב&quot;דף הבית: הסקציות למטה&quot;.</p>
       </Group>
 
       <Group title="קישורים נוספים">
@@ -163,19 +147,6 @@ export function SettingsForm({ initial, emailReady }: { initial: SiteSettings; e
         </button>
       </Group>
 
-      <Group title="רשימת תפוצה">
-        {!emailReady && (
-          <p className="rounded-lg bg-[#fff7e8] p-3 text-[14px]">
-            שליחת מיילים עוד לא מוגדרת (חסרים RESEND_API_KEY ו־NEWSLETTER_FROM_EMAIL). עד אז הטופס לא יוצג באתר גם אם הוא מופעל.
-          </p>
-        )}
-        <label className="flex items-center gap-2 font-bold">
-          <input type="checkbox" checked={s.newsletterEnabled} onChange={(e) => set({ newsletterEnabled: e.target.checked })} className="size-4 accent-[#12332A]" />
-          הצג טופס הרשמה בדף הבית
-        </label>
-        <F label="כותרת">{text("newsletterTitle")}</F>
-        <F label="טקסט">{text("newsletterText", { area: true })}</F>
-      </Group>
     </div>
   );
 }

@@ -4,11 +4,12 @@ import { createHash } from "node:crypto";
 import { headers } from "next/headers";
 import { z } from "zod";
 import { db, ensureSchema } from "@/lib/db";
-import { WAITLIST_CONSENT, isWaitlistList } from "@/lib/waitlist";
+import { WAITLISTS, consentFor, isWaitlistList } from "@/lib/waitlist";
 
 export type WaitlistState = { ok: boolean; message: string } | null;
 
 const DONE = "נרשמת! אעדכן אותך ברגע שהקורס נפתח.";
+const DONE_LEARN = "קיבלתי, תודה! ככה אני יודע מה לבנות קודם.";
 const sha = (s: string) => createHash("sha256").update(s).digest("hex");
 
 const phone = /^\+?[\d\s\-()]{9,20}$/;
@@ -49,9 +50,14 @@ export async function joinWaitlist(_prev: WaitlistState, formData: FormData): Pr
     select count(*)::int as count from waitlist where ip_hash = ${ipHash} and created_at > now() - interval '1 hour'`;
   if (count >= 5) return { ok: false, message: "יותר מדי ניסיונות. נסה שוב מאוחר יותר." };
 
-  const { name, contact, wish } = parsed.data;
+  const w = WAITLISTS[list];
+  const { name, contact } = parsed.data;
+  // Topic chips (only the ones the form offers) are kept at the start of the free text.
+  const allowed = new Set(("topics" in w ? w.topics : []).map((t) => t.label));
+  const topics = formData.getAll("topic").map(String).filter((t) => allowed.has(t));
+  const wish = (topics.length ? `[${topics.join(", ")}] ${parsed.data.wish}` : parsed.data.wish).trim().slice(0, 500);
   await sql`
     insert into waitlist (list, name, contact, wish, consent_text, ip_hash)
-    values (${list}, ${name}, ${contact}, ${wish}, ${WAITLIST_CONSENT}, ${ipHash})`;
-  return { ok: true, message: DONE };
+    values (${list}, ${name}, ${contact}, ${wish}, ${consentFor(w)}, ${ipHash})`;
+  return { ok: true, message: list === "learn" ? DONE_LEARN : DONE };
 }
