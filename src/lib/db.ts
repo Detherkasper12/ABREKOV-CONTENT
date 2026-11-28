@@ -32,7 +32,7 @@ export function db(): Sql {
   return globalForDb.__abrekovSql;
 }
 
-// Additive columns added after the first release (supabase/migrations/0002_resource_file.sql, 0003_unlisted.sql).
+// Additive columns added after the first release (supabase/migrations/0002_resource_file.sql, 0003_unlisted.sql, 0004_waitlist.sql).
 // Applied once per server instance before the first read or write, so a deploy never waits on a manual SQL step.
 // Guides bundled in the repo are seeded right after (see bundled-guides.ts).
 let schemaReady: Promise<unknown> | undefined;
@@ -42,7 +42,18 @@ export function ensureSchema() {
       `alter table resources add column if not exists file_url text not null default '';
        alter table resources add column if not exists file_name text not null default '';
        alter table resources add column if not exists file_size bigint not null default 0;
-       alter table resources add column if not exists unlisted boolean not null default false;`,
+       alter table resources add column if not exists unlisted boolean not null default false;
+       create table if not exists waitlist (
+         id uuid primary key default gen_random_uuid(),
+         list text not null default 'agents-course',
+         name text not null check (length(name) <= 80),
+         contact text not null check (length(contact) <= 120),
+         wish text not null default '' check (length(wish) <= 500),
+         consent_text text not null,
+         ip_hash text not null default '',
+         created_at timestamptz not null default now()
+       );
+       alter table waitlist enable row level security;`,
     )
     .then(() => seedBundledGuides(db()))
     .catch((e) => {
