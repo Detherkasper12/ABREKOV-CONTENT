@@ -5,6 +5,7 @@ import { SiteShell } from "@/components/SiteShell";
 import { getPublishedBySlug, getSettings, listRelated } from "@/lib/data";
 
 // Content is edited live from /admin, so pages render on request and never need a redeploy.
+// Rendered per request from cached data (see lib/data.ts), so no page waits on the database.
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata(props: PageProps<"/resources/[slug]">): Promise<Metadata> {

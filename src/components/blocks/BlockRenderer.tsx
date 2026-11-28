@@ -1,5 +1,5 @@
 /* eslint-disable @next/next/no-img-element -- media lives in Supabase Storage; plain <img> keeps it simple and fast */
-import { headingAnchor, videoEmbed, type Block } from "@/lib/blocks";
+import { headingAnchor, stepNumber, videoEmbed, type Block, type BlockOf } from "@/lib/blocks";
 import { CopyButton } from "../CopyButton";
 import { RichText } from "./RichText";
 
@@ -78,7 +78,12 @@ export function BlockView({ block }: { block: Block }) {
       return (
         <div className="codebox prompt">
           <div className="codebox-head">
-            <span>{block.title || "פרומפט"}</span>
+            <span>
+              <i className="pq" aria-hidden>
+                ”
+              </i>
+              {block.title || "פרומפט"}
+            </span>
             <CopyButton text={block.text} label="העתק פרומפט" kind="prompt" />
           </div>
           <pre dir="auto">{block.text}</pre>
@@ -87,18 +92,14 @@ export function BlockView({ block }: { block: Block }) {
     case "link":
       if (!block.url) return null;
       return (
-        <a
-          href={block.url}
-          {...(isExternal(block.url) ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-          className="card group flex items-center justify-between gap-4 p-4 transition-colors hover:border-forest"
-        >
-          <span className="grid min-w-0 gap-1">
-            <span className="font-extrabold">{block.title || displayHost(block.url)}</span>
-            {block.description && <span className="text-[15px] text-muted">{block.description}</span>}
-            <span className="ltr truncate text-start font-mono text-[12.5px] text-forest">{displayHost(block.url)}</span>
+        <a href={block.url} {...(isExternal(block.url) ? { target: "_blank", rel: "noopener noreferrer" } : {})} className="lk">
+          <span className="lk-t">
+            <b>{block.title || displayHost(block.url)}</b>
+            {block.description && <span className="lk-d">{block.description}</span>}
+            <span className="lk-u ltr">{displayHost(block.url)}</span>
           </span>
-          <span aria-hidden className="text-xl text-forest transition-transform group-hover:-translate-x-1">
-            ←
+          <span className="lk-go" aria-hidden>
+            ↗
           </span>
         </a>
       );
@@ -168,12 +169,53 @@ export function BlockView({ block }: { block: Block }) {
   }
 }
 
-export function BlockList({ blocks }: { blocks: Block[] }) {
+export function BlockList({ blocks, steps = false }: { blocks: Block[]; steps?: boolean }) {
+  if (!steps) {
+    return (
+      <div className="doc">
+        {blocks.map((b) => (
+          <BlockView key={b.id} block={b} />
+        ))}
+      </div>
+    );
+  }
+  // A guide reads as steps: every level-2 heading opens a numbered section with its own badge,
+  // and what comes before the first heading is the intro.
+  const intro: Block[] = [];
+  const sections: { h: BlockOf<"heading">; items: Block[] }[] = [];
+  for (const b of blocks) {
+    if (b.type === "heading" && b.level === 2 && b.text) sections.push({ h: b, items: [] });
+    else if (sections.length) sections[sections.length - 1].items.push(b);
+    else intro.push(b);
+  }
   return (
-    <div className="doc">
-      {blocks.map((b) => (
-        <BlockView key={b.id} block={b} />
-      ))}
+    <div className="doc steps">
+      {intro.length > 0 && (
+        <div className="intro">
+          {intro.map((b) => (
+            <BlockView key={b.id} block={b} />
+          ))}
+        </div>
+      )}
+      {sections.map(({ h, items }, i) => {
+        const { no, title } = stepNumber(h.text, i);
+        const id = headingAnchor(h);
+        return (
+          <section key={h.id} className="step" aria-labelledby={id}>
+            <header className="step-h">
+              <span className="no F" aria-hidden>
+                {no}
+              </span>
+              <h2 id={id}>{title}</h2>
+            </header>
+            <div className="step-b">
+              {items.map((b) => (
+                <BlockView key={b.id} block={b} />
+              ))}
+            </div>
+          </section>
+        );
+      })}
     </div>
   );
 }

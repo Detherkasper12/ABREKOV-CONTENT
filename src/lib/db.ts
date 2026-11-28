@@ -37,6 +37,9 @@ export function db(): Sql {
 // Guides bundled in the repo are seeded right after (see bundled-guides.ts).
 let schemaReady: Promise<unknown> | undefined;
 export function ensureSchema() {
+  // At build time pages are only read for prerendering: no DDL or seeding there, so a build never
+  // waits on a table lock held by the live site. The first request after the deploy applies them.
+  if (process.env.NEXT_PHASE === "phase-production-build") return Promise.resolve();
   schemaReady ??= db()
     .unsafe(
       `alter table resources add column if not exists file_url text not null default '';

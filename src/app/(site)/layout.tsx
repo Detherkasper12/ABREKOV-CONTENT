@@ -1,4 +1,5 @@
-// Settings come from the database and are edited live, so nothing under this layout is prerendered at build time.
+// Pages render per request but read cached data (lib/data.ts), so nothing waits on the database,
+// and nothing touches it at build time. Every admin save refreshes that cache.
 // Each page wraps itself in <SiteShell>, because a link-only guide renders a reduced header.
 export const dynamic = "force-dynamic";
 

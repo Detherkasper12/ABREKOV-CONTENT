@@ -1,4 +1,5 @@
 import "server-only";
+import { unstable_cache } from "next/cache";
 import { db, ensureSchema } from "./db";
 import { blocksSchema, type Block } from "./blocks";
 import { DEFAULT_SETTINGS, settingsSchema, type SiteSettings } from "./settings-schema";
@@ -76,7 +77,7 @@ const SUMMARY_COLUMNS = [
 
 // Public queries only ever return published rows. A link-only (unlisted) one is returned
 // by slug alone, never by the list queries.
-export async function listPublished(): Promise<ResourceSummary[]> {
+async function loadPublished(): Promise<ResourceSummary[]> {
   await ensureSchema();
   const sql = db();
   const rows = await sql`
@@ -86,7 +87,7 @@ export async function listPublished(): Promise<ResourceSummary[]> {
   return rows.map(toSummary);
 }
 
-export async function getPublishedBySlug(slug: string): Promise<Resource | null> {
+async function loadBySlug(slug: string): Promise<Resource | null> {
   // A DM link can be the first request a fresh instance gets, so make sure bundled guides exist.
   await ensureSchema();
   const sql = db();
@@ -94,7 +95,7 @@ export async function getPublishedBySlug(slug: string): Promise<Resource | null>
   return row ? toResource(row) : null;
 }
 
-export async function listRelated(resource: Resource, limit = 3): Promise<ResourceSummary[]> {
+async function loadRelated(resource: Pick<Resource, "id" | "category" | "tags">, limit = 3): Promise<ResourceSummary[]> {
   await ensureSchema();
   const sql = db();
   const rows = await sql`
@@ -128,7 +129,7 @@ const LEGACY_DEFAULTS: Record<string, string> = {
   telegramNote: "לחיצה אחת, ואפשר לצאת בכל רגע",
 };
 
-export async function getSettings(): Promise<SiteSettings> {
+async function loadSettings(): Promise<SiteSettings> {
   const sql = db();
   const [row] = await sql`select data from site_settings where id = 1`;
   const stored = { ...((row?.data as Record<string, unknown>) ?? {}) };
@@ -144,4 +145,40 @@ export async function getSettings(): Promise<SiteSettings> {
     if (rest.success) return rest.data;
   }
   return parsed.success ? parsed.data : DEFAULT_SETTINGS;
+}
+
+// ---------- Cached reads for the public site ----------
+// Public pages read through the Next data cache, so a visit costs no database round trip.
+// Every admin save calls updateTag(CONTENT_TAG) and the next visit sees the change at once.
+// The cache stores JSON, so dates come back as strings and are turned back into Dates here.
+export const CONTENT_TAG = "content";
+const CACHE = { tags: [CONTENT_TAG], revalidate: 3600 };
+
+function reviveDates<T>(x: T): T {
+  if (!x || typeof x !== "object") return x;
+  const o = x as Record<string, unknown>;
+  for (const k of ["createdAt", "updatedAt", "publishedAt"]) if (typeof o[k] === "string") o[k] = new Date(o[k] as string);
+  return x;
+}
+
+const cachedPublished = unstable_cache(loadPublished, ["published"], CACHE);
+const cachedBySlug = unstable_cache(loadBySlug, ["by-slug"], CACHE);
+const cachedRelated = unstable_cache(
+  (id: string, category: string, tags: string[], limit: number) => loadRelated({ id, category, tags }, limit),
+  ["related"],
+  CACHE,
+);
+const cachedSettings = unstable_cache(loadSettings, ["settings"], CACHE);
+
+export async function listPublished(): Promise<ResourceSummary[]> {
+  return (await cachedPublished()).map(reviveDates);
+}
+export async function getPublishedBySlug(slug: string): Promise<Resource | null> {
+  return reviveDates(await cachedBySlug(slug));
+}
+export async function listRelated(resource: Pick<Resource, "id" | "category" | "tags">, limit = 3): Promise<ResourceSummary[]> {
+  return (await cachedRelated(resource.id, resource.category, resource.tags, limit)).map(reviveDates);
+}
+export function getSettings(): Promise<SiteSettings> {
+  return cachedSettings();
 }

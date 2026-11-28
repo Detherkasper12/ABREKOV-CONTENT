@@ -137,3 +137,15 @@ export function videoEmbed(url: string): { kind: "iframe" | "file"; src: string 
   }
   return null;
 }
+
+// "01 · UI/UX Pro Max" -> number "01" and title "UI/UX Pro Max". A heading without its own number gets
+// its position, so every step of a guide shows the same big number badge.
+export function stepNumber(text: string, index: number) {
+  const m = text.match(/^[\s‎‏]*(\d{1,2})[\s‎‏]*[·.\-–—:)][\s‎‏]*(.+)$/);
+  if (m) return { no: m[1].padStart(2, "0"), title: m[2].trim() };
+  const w = text.match(/^\s*(?:שלב|step)\s*(\d{1,2})[\s\u200e\u200f]*[·.\-–—:)][\s\u200e\u200f]*(.+)$/i);
+  if (w) return { no: w[1].padStart(2, "0"), title: w[2].trim() };
+  const t = text.match(/^(.+?)\s*[·\-–—:]\s*(\d{1,2})\s*$/);
+  if (t) return { no: t[2].padStart(2, "0"), title: t[1].trim() };
+  return { no: String(index + 1).padStart(2, "0"), title: text.trim() };
+}

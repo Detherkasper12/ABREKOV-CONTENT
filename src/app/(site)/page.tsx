@@ -9,6 +9,7 @@ import { getSettings, listPublished } from "@/lib/data";
 import { splitPairs } from "@/lib/home-schema";
 import { consentFor, WAITLISTS } from "@/lib/waitlist";
 
+// Rendered per request from cached data (see lib/data.ts), so no page waits on the database.
 export const dynamic = "force-dynamic";
 export const metadata = { alternates: { canonical: "/" } };
 
@@ -27,7 +28,7 @@ export default async function HomePage() {
       <a className="skiplink" href="#library">
         לכל המדריכים
       </a>
-      <SiteHeader current="home" fixed />
+      <SiteHeader settings={settings} current="home" fixed />
       <main dir="rtl" lang="he">
         <Story home={home} />
 

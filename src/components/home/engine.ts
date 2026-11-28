@@ -399,23 +399,32 @@ export function startStory(site: El): () => void {
   if (hero && knob && pill) {
     const range = () => hero.offsetHeight - innerHeight;
     const send = () => scrollTo({ top: hero.offsetTop + 0.8 * range(), behavior: RM ? "auto" : "smooth" });
-    on(knob, "pointerdown", ((e: PointerEvent) => {
-      if (prog(hero) > 0.34) return;
+    // The whole pill is the slider: a finger anywhere on it drags the knob from where it is.
+    on(pill, "pointerdown", ((e: PointerEvent) => {
+      if (prog(hero) > 0.34 || e.button > 0) return;
       dragging = true;
-      knob.setPointerCapture(e.pointerId);
-      const pr = pill.getBoundingClientRect(), PW = pr.width, KW = knob.getBoundingClientRect().width, pad = (mob ? 12 : 30) * S;
-      const move = (ev: PointerEvent) => { heroK = cl((PW - pad - KW / 2 - (ev.clientX - pr.left)) / (PW - 2 * pad - KW)); runHero(prog(hero)); };
+      pill.setPointerCapture(e.pointerId);
+      const pr = pill.getBoundingClientRect(), KW = knob.getBoundingClientRect().width, pad = (mob ? 12 : 30) * S;
+      const span = pr.width - 2 * pad - KW, x0 = e.clientX, k0 = heroK;
+      const onKnob = e.target instanceof Element && !!e.target.closest(".knob");
+      let moved = false;
+      const move = (ev: PointerEvent) => {
+        if (Math.abs(ev.clientX - x0) > 4) moved = true;
+        heroK = cl(k0 + (x0 - ev.clientX) / span);
+        runHero(prog(hero));
+      };
       const up = () => {
         dragging = false;
-        knob.removeEventListener("pointermove", move);
-        knob.removeEventListener("pointerup", up);
-        knob.removeEventListener("pointercancel", up);
-        if (heroK > 0.6) send();
+        pill.removeEventListener("pointermove", move);
+        pill.removeEventListener("pointerup", up);
+        pill.removeEventListener("pointercancel", up);
+        // A drag past the middle sends; a plain tap on the knob sends too.
+        if (heroK > 0.5 || (!moved && onKnob)) send();
         else { heroK = 0; runHero(prog(hero)); }
       };
-      knob.addEventListener("pointermove", move);
-      knob.addEventListener("pointerup", up);
-      knob.addEventListener("pointercancel", up);
+      pill.addEventListener("pointermove", move);
+      pill.addEventListener("pointerup", up);
+      pill.addEventListener("pointercancel", up);
     }) as EventListener);
     on(knob, "click", ((e: MouseEvent) => { if (e.detail === 0) send(); }) as EventListener);
   }

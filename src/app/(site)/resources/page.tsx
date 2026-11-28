@@ -2,6 +2,7 @@ import { Library } from "@/components/Library";
 import { SiteShell } from "@/components/SiteShell";
 import { getSettings, listPublished } from "@/lib/data";
 
+// Rendered per request from cached data (see lib/data.ts), so no page waits on the database.
 export const dynamic = "force-dynamic";
 export const metadata = {
   title: "מדריכים",
@@ -9,8 +10,8 @@ export const metadata = {
   alternates: { canonical: "/resources" },
 };
 
-export default async function LibraryPage(props: PageProps<"/resources">) {
-  const [settings, resources, sp] = await Promise.all([getSettings(), listPublished(), props.searchParams]);
+export default async function LibraryPage() {
+  const [settings, resources] = await Promise.all([getSettings(), listPublished()]);
   const home = settings.home;
   return (
     <SiteShell settings={settings} current="library">
@@ -20,7 +21,7 @@ export default async function LibraryPage(props: PageProps<"/resources">) {
           <h1 className="F">{home.libraryTitle}</h1>
           {home.libraryText && <p>{home.libraryText}</p>}
         </header>
-        <Library resources={resources} categories={settings.categories} initialCategory={typeof sp.category === "string" ? sp.category : ""} />
+        <Library resources={resources} categories={settings.categories} />
         <p className="note-dm">
           <i aria-hidden />
           מדריכים שנשלחים בהודעה פרטית לא מופיעים כאן. הם נפתחים רק מהקישור.

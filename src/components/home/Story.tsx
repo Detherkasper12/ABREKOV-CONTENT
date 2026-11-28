@@ -414,7 +414,8 @@ export function Story({ home }: { home: HomeContent }) {
             data-dur={s.template === "timeline" ? s.big : undefined}
             data-hbg={p.bg}
             data-hfg={p.fg}
-            style={paletteVars(s.palette)}
+            // The scene arrives on the colour the previous one ended on, so no black frame shows between them.
+            style={{ ...paletteVars(s.palette), "--prev": i ? palette(scenes[i - 1].palette).bg : "#0B0B0B" } as CSSProperties}
             aria-label={s.name || s.prompt}
           >
             <T s={s} i={i} total={total} />
