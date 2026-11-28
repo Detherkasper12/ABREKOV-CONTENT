@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { SiteSettings } from "@/lib/settings-schema";
+import { SiteMenu } from "./SiteMenu";
 
 export function instagramUrl(handle: string) {
   return `https://www.instagram.com/${handle.replace(/^@/, "")}/`;
@@ -9,7 +10,11 @@ export type NavKey = "home" | "library" | "agents" | "learn" | "";
 
 // One header for every public page. On the home story it is fixed and takes the colours of the scene
 // under it (`fixed`). A link-only guide gets a quiet version: the logo and one way back into the site.
-export function SiteHeader({ current = "", fixed = false, quiet = false }: { settings?: SiteSettings; current?: NavKey; fixed?: boolean; quiet?: boolean }) {
+export function SiteHeader({ settings, current = "", fixed = false, quiet = false }: { settings?: SiteSettings; current?: NavKey; fixed?: boolean; quiet?: boolean }) {
+  const extra = [
+    settings?.instagramHandle && { label: "Instagram", url: instagramUrl(settings.instagramHandle) },
+    settings?.telegramUrl && { label: "קהילה בוואטסאפ", url: settings.telegramUrl },
+  ].filter(Boolean) as { label: string; url: string }[];
   const cur = (k: NavKey) => (k === current ? { "aria-current": "page" as const } : {});
   return (
     <header className={`top${fixed ? " fx" : ""}`} data-top>
@@ -41,6 +46,7 @@ export function SiteHeader({ current = "", fixed = false, quiet = false }: { set
               <Link className="tk" href="/resources">
                 מדריכים בחינם
               </Link>
+              <SiteMenu extra={extra} />
             </span>
           </>
         )}

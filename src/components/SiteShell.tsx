@@ -24,7 +24,7 @@ export async function SiteShell({
       <a className="skiplink" href="#main">
         לתוכן
       </a>
-      <SiteHeader current={current} quiet={quiet} />
+      <SiteHeader settings={s} current={current} quiet={quiet} />
       <main id="main" dir="rtl" lang="he">
         {children}
       </main>

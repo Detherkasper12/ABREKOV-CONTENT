@@ -21,10 +21,10 @@ function firstIssue(error: z.ZodError) {
   return path ? `${issue.message} (${path})` : (issue?.message ?? "נתונים לא תקינים");
 }
 
-function refreshPublic(...slugs: string[]) {
-  revalidatePath("/");
-  revalidatePath("/resources");
-  for (const s of slugs) revalidatePath(`/resources/${s}`);
+// Public pages are static. Any content change can show up on several pages (home rows, related guides),
+// so every save rebuilds the whole public site on its next visit.
+function refreshPublic() {
+  revalidatePath("/", "layout");
   revalidatePath("/sitemap.xml");
 }
 
@@ -106,7 +106,7 @@ export async function saveResource(input: ResourceInput): Promise<ActionResult &
       file_size = ${file.size}, blocks = ${sql.json(r.blocks as never)}, updated_at = now()
     where id = ${r.id}`;
 
-  refreshPublic(r.slug, current.slug);
+  refreshPublic();
   revalidatePath("/admin");
   return { ok: true, slug: r.slug };
 }
@@ -127,7 +127,7 @@ export async function setStatus(id: string, status: "draft" | "published" | "arc
     update resources set status = ${status}, updated_at = now(),
       published_at = case when ${status} = 'published' then coalesce(published_at, now()) else published_at end
     where id = ${id}`;
-  refreshPublic(current.slug);
+  refreshPublic();
   revalidatePath("/admin");
   return { ok: true };
 }
@@ -137,7 +137,7 @@ export async function toggleFeatured(id: string): Promise<ActionResult> {
   if (!idSchema.safeParse(id).success) return { ok: false, error: "בקשה לא תקינה" };
   const sql = db();
   const [row] = await sql`update resources set featured = not featured where id = ${id} returning slug`;
-  if (row) refreshPublic(row.slug as string);
+  if (row) refreshPublic();
   revalidatePath("/admin");
   return { ok: true };
 }
@@ -164,7 +164,7 @@ export async function deleteResource(id: string): Promise<ActionResult> {
   if (!idSchema.safeParse(id).success) return { ok: false, error: "בקשה לא תקינה" };
   const sql = db();
   const [row] = await sql`delete from resources where id = ${id} returning slug`;
-  if (row) refreshPublic(row.slug as string);
+  if (row) refreshPublic();
   revalidatePath("/admin");
   return { ok: true };
 }

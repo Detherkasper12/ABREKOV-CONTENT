@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { ResourceSummary } from "@/lib/data";
 import { guidePalette, rowColors } from "@/lib/palette";
 import { GuideRow } from "./GuideRow";
@@ -13,9 +13,15 @@ function normalize(s: string) {
 }
 
 // The guide list on /resources: topic chips in each topic's colour, and a search field.
-export function Library({ resources, categories, initialCategory }: { resources: ResourceSummary[]; categories: Category[]; initialCategory: string }) {
+export function Library({ resources, categories }: { resources: ResourceSummary[]; categories: Category[] }) {
   const [query, setQuery] = useState("");
-  const [category, setCategory] = useState(categories.some((c) => c.slug === initialCategory) ? initialCategory : "");
+  const [category, setCategory] = useState("");
+  // The page is static, so a shared ?category= link is read in the browser.
+  useEffect(() => {
+    const c = new URLSearchParams(window.location.search).get("category") ?? "";
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- one read of the URL after mount
+    if (categories.some((x) => x.slug === c)) setCategory(c);
+  }, [categories]);
   const labels = useMemo(() => new Map(categories.map((c) => [c.slug, c.label])), [categories]);
   // Only categories that have guides get a chip, so no chip leads to an empty list.
   const used = categories.filter((c) => resources.some((r) => r.category === c.slug));

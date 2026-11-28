@@ -5,7 +5,12 @@ import { SiteShell } from "@/components/SiteShell";
 import { getPublishedBySlug, getSettings, listRelated } from "@/lib/data";
 
 // Content is edited live from /admin, so pages render on request and never need a redeploy.
-export const dynamic = "force-dynamic";
+// Static, rebuilt on every admin save (and at most hourly as a fallback).
+export const revalidate = 3600;
+// Guides are rendered on their first visit and then served from the cache.
+export function generateStaticParams() {
+  return [];
+}
 
 export async function generateMetadata(props: PageProps<"/resources/[slug]">): Promise<Metadata> {
   const { slug } = await props.params;

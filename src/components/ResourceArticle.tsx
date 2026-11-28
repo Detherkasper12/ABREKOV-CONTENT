@@ -1,12 +1,13 @@
 /* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
-import { headingAnchor, type BlockOf } from "@/lib/blocks";
+import { headingAnchor, stepNumber, type BlockOf } from "@/lib/blocks";
 import type { Resource, ResourceSummary } from "@/lib/data";
-import { paletteVars } from "@/lib/palette";
+import { guidePalette, paletteVars, rowColors } from "@/lib/palette";
 import type { SiteSettings } from "@/lib/settings-schema";
 import { consentFor, offerFor } from "@/lib/waitlist";
 import { BlockList } from "./blocks/BlockRenderer";
 import { GuideRow } from "./GuideRow";
+import { GuideToc } from "./GuideToc";
 import { formatPrice } from "./ResourceCard";
 import { WaitlistForm } from "./WaitlistForm";
 
@@ -20,11 +21,13 @@ export function ResourceArticle({ resource: r, settings, related }: { resource: 
   const canBuy = r.kind === "paid" && /^https:\/\//.test(r.checkoutUrl) && (r.priceIls ?? 0) > 0;
   const offer = r.kind === "free" ? offerFor(r.slug, r.offer) : null;
   const cat = r.category ? categories.get(r.category) : undefined;
+  const steps = headings.map((h, i) => ({ id: headingAnchor(h), ...stepNumber(h.text, i) }));
   const eyebrow = ["GUIDE", r.label, r.kind === "paid" ? "DIGITAL PRODUCT" : "FREE"].filter(Boolean).join(" · ");
 
   return (
     <>
-      <article className="gd">
+      <article className={`gd${steps.length > 1 ? " has-toc" : ""}`} style={rowColors(guidePalette(r.accent, r.category))}>
+        <div className="gd-head">
         {!r.unlisted && (
           <nav className="crumbs" aria-label="פירורי לחם">
             <Link href="/resources">מדריכים</Link>
@@ -90,19 +93,12 @@ export function ResourceArticle({ resource: r, settings, related }: { resource: 
           </div>
         )}
 
-        {headings.length > 2 && (
-          <nav className="toc" aria-label="תוכן העניינים">
-            {headings.map((h, i) => (
-              <a key={h.id} href={`#${headingAnchor(h)}`}>
-                {String(i + 1).padStart(2, "0")} · {h.text}
-              </a>
-            ))}
-          </nav>
-        )}
+        </div>
+        {steps.length > 1 && <GuideToc items={steps} />}
 
         <div className="body">
           {r.kind === "paid" && r.blocks.length > 0 && <p className="m pv">PREVIEW</p>}
-          <BlockList blocks={r.blocks} />
+          <BlockList blocks={r.blocks} steps />
         </div>
       </article>
 

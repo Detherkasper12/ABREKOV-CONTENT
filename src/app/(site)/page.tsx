@@ -9,7 +9,8 @@ import { getSettings, listPublished } from "@/lib/data";
 import { splitPairs } from "@/lib/home-schema";
 import { consentFor, WAITLISTS } from "@/lib/waitlist";
 
-export const dynamic = "force-dynamic";
+// Static, rebuilt on every admin save (and at most hourly as a fallback).
+export const revalidate = 3600;
 export const metadata = { alternates: { canonical: "/" } };
 
 const HOME_GUIDES = 6;
@@ -27,7 +28,7 @@ export default async function HomePage() {
       <a className="skiplink" href="#library">
         לכל המדריכים
       </a>
-      <SiteHeader current="home" fixed />
+      <SiteHeader settings={settings} current="home" fixed />
       <main dir="rtl" lang="he">
         <Story home={home} />
 

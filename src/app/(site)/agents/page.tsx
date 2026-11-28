@@ -1,7 +1,8 @@
 import { WaitlistPage, waitlistMetadata } from "@/components/WaitlistPage";
 import { WAITLISTS } from "@/lib/waitlist";
 
-export const dynamic = "force-dynamic";
+// Static, rebuilt on every admin save (and at most hourly as a fallback).
+export const revalidate = 3600;
 export const metadata = waitlistMetadata(WAITLISTS["agents-course"]);
 
 export default function AgentsWaitlistPage() {
